@@ -8,10 +8,11 @@ out vec3 vertexColor;
 out vec2 TexCoord;
 
 uniform mat4 PassedTransform;
+uniform float PassedZDepth;
 
 void main()
 {
-    gl_Position = PassedTransform * vec4(aPos, 0.f, 1.f);
+    gl_Position = PassedTransform * vec4(aPos, PassedZDepth, 1.f);
     vertexColor = aColor;
     TexCoord = aTexCoord;
 }

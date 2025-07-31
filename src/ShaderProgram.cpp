@@ -131,23 +131,24 @@ void ShaderProgram::PreparePolygon() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
+	constexpr auto AttrSetSize = 7 * sizeof(float);
 	// Vertex Position attribute
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// Vertex Color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	// Vertex UV attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)(5 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 }
 
 void ShaderProgram::FindUniforms() {
 	// TODO: Generalized Uniforms access.
-	Uniform_VertexColorLocation = glGetUniformLocation(ShaderProgramID, "PassedColor");
 	Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
+	Uniform_ZDepth = glGetUniformLocation(ShaderProgramID, "PassedZDepth");
 }
 
 void ShaderProgram::Use()
@@ -169,6 +170,7 @@ void ShaderProgram::Render()
 
 	// TODO: Set the uniforms from some template function.
 	glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
+	glUniform1f(Uniform_ZDepth, ZDepth);
 
 	// glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

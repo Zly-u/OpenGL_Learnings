@@ -84,7 +84,7 @@ void Sprite::LoadImage(const std::string_view& ImagePath) {
 void Sprite::Render() {
 	glm::mat4 Transform{1.0f};
 
-	Transform = glm::translate(Transform, Location);
+	Transform = glm::translate(Transform, glm::vec3(Location, 0.f));
 	Transform = glm::rotate(Transform, glm::radians(Rotation), glm::vec3(0.0, 0.0, 1.0));
 	Transform = glm::scale(Transform, Scale);
 

@@ -31,8 +31,10 @@ class ShaderProgram
 
 		int32_t Uniform_VertexColorLocation;
 		int32_t Uniform_Transform;
+		int32_t Uniform_ZDepth;
 
 
 	public:
 		glm::mat4 Transform{1.f};
+		float ZDepth = 0.f;
 };
