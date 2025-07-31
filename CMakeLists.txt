@@ -23,20 +23,30 @@ target_include_directories(${G_PROJECT_NAME} PUBLIC include)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glad REQUIRED)
+find_package(glm REQUIRED)
+find_package(Stb REQUIRED)
+
+target_include_directories(
+	${G_PROJECT_NAME}
+	PRIVATE
+	${Stb_INCLUDE_DIR}
+)
 
 target_link_libraries(
 	${G_PROJECT_NAME}
-	PRIVATE
+	PUBLIC
 	OpenGL::GL
 	glfw
 	glad::glad
+	glm::glm
 )
 
 set(
 	DIRS_TO_COPY
 	shaders
-#	Assets
+	Assets
 )
+
 install(
 	DIRECTORY ${DIRS_TO_COPY}
 	DESTINATION ${G_BUILD_FOLDER}
