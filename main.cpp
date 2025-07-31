@@ -13,6 +13,11 @@ int OldWidth, OldHeight;
 
 std::vector<Sprite> Sprites;
 
+
+ShaderProgram* g_ShaderProgramPtr;
+
+
+
 void ProcessInput(GLFWwindow* Window) {
 	if (glfwGetKey(Window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(Window, true);
@@ -23,6 +28,9 @@ void ProcessInput(GLFWwindow* Window) {
 void Render(GLFWwindow* Window) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	g_ShaderProgramPtr->Use();
+	glBindVertexArray(g_ShaderProgramPtr->VAO);
 
 	for (Sprite& Sprite : Sprites) {
 		Sprite.Render();
@@ -74,9 +82,14 @@ int main() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	ShaderProgram g_ShaderProgram{"shaders/vertex.glsl", "shaders/fragment.glsl"};
+	g_ShaderProgramPtr = &g_ShaderProgram;
 
 	// Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
-	Sprites.emplace_back("Assets/TextureTest.png");
+	Sprite& Sprite_1 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
+	// Sprite_1.Location.x = 1.f;
+
+	// Sprite& Sprite_2 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
+	// Sprite_2.Location.x = -1.f;
 
 	while(!glfwWindowShouldClose(Window))
 	{

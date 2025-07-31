@@ -28,7 +28,8 @@ class Sprite {
 
 
 	public:
-		glm::vec3 Location{0.f};
+		glm::vec2 Location{0.f};
+		float ZDepth = 0.f;
 		float Rotation = 0.f;
 		glm::vec3 Scale{1.f};
 

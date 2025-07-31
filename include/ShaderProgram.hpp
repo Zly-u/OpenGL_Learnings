@@ -13,8 +13,9 @@ class ShaderProgram
 		void FindUniforms();
 
 		int64_t LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType);
-		void PreparePolygon();
-		void Render();
+		void    PreparePolygon();
+		void    Use();
+		void    Render();
 
 	public:
 		void SetTranform(const glm::mat4& NewTransform);

@@ -51,13 +51,6 @@ ShaderProgram::~ShaderProgram() {
 	glDeleteBuffers(1, &EBO);
 }
 
-
-void ShaderProgram::FindUniforms() {
-	// TODO: Generalized Uniforms access.
-	Uniform_VertexColorLocation = glGetUniformLocation(ShaderProgramID, "PassedColor");
-	Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
-}
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 int64_t ShaderProgram::LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) {
@@ -105,19 +98,19 @@ void ShaderProgram::PreparePolygon() {
 	};
 	float Vertices[] =
 	{
-		-0.5f,  0.5f, 0.0f, // top left
+		-0.5f,  0.5f, // top left
 		0.0f, 1.0f, 1.0f,	// Color
 		0.0f, 0.0f,			// UV
 
-		0.5f,  0.5f, 0.0f,  // top right
+		0.5f,  0.5f,  // top right
 		1.0f, 0.0f, 0.0f,	// Color
 		1.0f, 0.0f,			// UV
 
-		0.5f, -0.5f, 0.0f,  // bottom right
+		0.5f, -0.5f,  // bottom right
 		0.0f, 1.0f, 0.0f,	// Color
 		1.0f, 1.0f,			// UV
 
-	   -0.5f, -0.5f, 0.0f,  // bottom left
+	   -0.5f, -0.5f,  // bottom left
 		0.0f, 0.0f, 1.0f,	// Color
 		0.0f, 1.0f,			// UV
 	};
@@ -132,7 +125,6 @@ void ShaderProgram::PreparePolygon() {
 	glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO);
-
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 
@@ -140,18 +132,28 @@ void ShaderProgram::PreparePolygon() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
 	// Vertex Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// Vertex Color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
 	// Vertex UV attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 }
 
+void ShaderProgram::FindUniforms() {
+	// TODO: Generalized Uniforms access.
+	Uniform_VertexColorLocation = glGetUniformLocation(ShaderProgramID, "PassedColor");
+	Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
+}
+
+void ShaderProgram::Use()
+{
+	glUseProgram(ShaderProgramID);
+}
 
 void ShaderProgram::Render()
 {
@@ -163,12 +165,12 @@ void ShaderProgram::Render()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 
-	glUseProgram(ShaderProgramID);
+	// glUseProgram(ShaderProgramID);
 
 	// TODO: Set the uniforms from some template function.
 	glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
 
-	glBindVertexArray(VAO);
+	// glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
