@@ -80,9 +80,13 @@ int64_t ShaderProgram::LoadShaderFromFile(const std::string_view& ShaderFile, co
 	return NewShaderID;
 }
 
-void ShaderProgram::Render(uint32_t VAO)
+void ShaderProgram::Render(uint32_t VAO, uint32_t EBO)
 {
 	glUseProgram(ShaderProgramID);
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	// glBindVertexArray(VAO);
+
+	// glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
