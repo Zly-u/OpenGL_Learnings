@@ -17,10 +17,10 @@ struct TextureData
 class Sprite {
 	public:
 		Sprite();
-		Sprite(const ShaderProgram& OtherShaderProgram);
-		Sprite(const ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath);
+		Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath);
 		Sprite(const std::string_view& ImagePath);
 		Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader);
+		Sprite(ShaderProgram& OtherShaderProgram);
 
 		void Init();
 		void LoadImage(const std::string_view& ImagePath);
@@ -35,5 +35,5 @@ class Sprite {
 
 
 	private:
-		ShaderProgram Renderer;
+		ShaderProgram* Renderer;
 };

@@ -7,20 +7,20 @@
 #include "Logging.h"
 
 
-Sprite::Sprite(): Renderer("shaders/vertex.glsl", "shaders/fragment.glsl") {
+Sprite::Sprite(): Renderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")) {
 }
 
-Sprite::Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader): Renderer(VertexShader, FragmentShader) {
+Sprite::Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader): Renderer(new ShaderProgram(VertexShader, FragmentShader)) {
 }
 
-Sprite::Sprite(const ShaderProgram& OtherShaderProgram): Renderer(OtherShaderProgram) {
+Sprite::Sprite(ShaderProgram& OtherShaderProgram): Renderer(&OtherShaderProgram) {
 }
 
-Sprite::Sprite(const ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath): Renderer(OtherShaderProgram) {
+Sprite::Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath): Renderer(&OtherShaderProgram) {
 	LoadImage(ImagePath);
 }
 
-Sprite::Sprite(const std::string_view& ImagePath) : Renderer("shaders/vertex.glsl", "shaders/fragment.glsl"){
+Sprite::Sprite(const std::string_view& ImagePath) : Renderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")){
 	LoadImage(ImagePath);
 }
 
@@ -30,6 +30,10 @@ void Sprite::Init() {
 
 
 void Sprite::LoadImage(const std::string_view& ImagePath) {
+	if (Renderer->TextureID != 0) {
+		return;
+	}
+
 	int ImageWidth, ImageHeight, ColorChannels;
 	unsigned char * ImageData = stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
 	if (!ImageData)
@@ -51,8 +55,12 @@ void Sprite::LoadImage(const std::string_view& ImagePath) {
 	}
 
 	int rowAlignment = 1;
-	if ((ImageWidth * ColorChannels) % 4 == 0) rowAlignment = 4;
-	else if ((ImageWidth * ColorChannels) % 2 == 0) rowAlignment = 2;
+	if ((ImageWidth * ColorChannels) % 4 == 0) {
+		rowAlignment = 4;
+	}
+	else if ((ImageWidth * ColorChannels) % 2 == 0) {
+		rowAlignment = 2;
+	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, rowAlignment);
 
 	uint32_t NewTextureID;
@@ -78,7 +86,7 @@ void Sprite::LoadImage(const std::string_view& ImagePath) {
 
 	stbi_image_free(ImageData);
 
-	Renderer.TextureID = NewTextureID;
+	Renderer->TextureID = NewTextureID;
 }
 
 void Sprite::Render() {
@@ -88,6 +96,6 @@ void Sprite::Render() {
 	Transform = glm::rotate(Transform, glm::radians(Rotation), glm::vec3(0.0, 0.0, 1.0));
 	Transform = glm::scale(Transform, Scale);
 
-	Renderer.SetTranform(Transform);
-	Renderer.Render();
+	Renderer->SetTranform(Transform);
+	Renderer->Render();
 }

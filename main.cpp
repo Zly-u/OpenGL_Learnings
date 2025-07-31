@@ -86,16 +86,28 @@ int main() {
 
 	// Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
 	Sprite& Sprite_1 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
-	// Sprite_1.Location.x = 1.f;
+	Sprite_1.Location.x = 1.f;
 
-	// Sprite& Sprite_2 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
-	// Sprite_2.Location.x = -1.f;
+	Sprite& Sprite_2 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
+	Sprite_2.Location.x = -1.f;
 
 	while(!glfwWindowShouldClose(Window))
 	{
 		ProcessInput(Window);
 
-		Render(Window);
+		// Render(Window);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		g_ShaderProgram.Use();
+		glBindVertexArray(g_ShaderProgram.VAO);
+		glBindTexture(GL_TEXTURE_2D, g_ShaderProgram.TextureID);
+
+		for (Sprite& Sprite : Sprites) {
+			Sprite.Render();
+		}
+
+		glfwSwapBuffers(Window);
 
 		glfwPollEvents();
 	}

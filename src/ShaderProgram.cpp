@@ -125,9 +125,12 @@ void ShaderProgram::PreparePolygon() {
 	glGenBuffers(1, &EBO);
 
 	glBindVertexArray(VAO);
+
+	// Vertex buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
 
+	// Element buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
@@ -143,6 +146,8 @@ void ShaderProgram::PreparePolygon() {
 	// Vertex UV attribute
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)(5 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0);
 }
 
 void ShaderProgram::FindUniforms() {
@@ -158,13 +163,13 @@ void ShaderProgram::Use()
 
 void ShaderProgram::Render()
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureID);
+	// glActiveTexture(GL_TEXTURE0);
+	// glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	// glUseProgram(ShaderProgramID);
 
