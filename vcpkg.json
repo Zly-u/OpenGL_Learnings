@@ -1,0 +1,11 @@
+{
+  "name" : "openglstuff",
+  "version" : "0.0.0",
+  "dependencies" : [ "opengl", {
+    "name" : "glfw3",
+    "version>=" : "3.4#1"
+  }, {
+    "name" : "glad",
+    "version>=" : "0.1.36"
+  } ]
+}

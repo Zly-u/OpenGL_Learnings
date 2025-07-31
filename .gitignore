@@ -1,0 +1,7 @@
+/.idea
+/.vs
+
+/out
+/__CMAKE_BUILD__
+
+CMakeSettings.json

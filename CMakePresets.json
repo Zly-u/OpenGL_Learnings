@@ -1,0 +1,100 @@
+{
+	"version": 10,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 21
+	},
+	"configurePresets": [
+		{
+			"name": "default",
+			"hidden": true,
+			"displayName": "Default config",
+			"description": "Default config with VCPKG setup.",
+			"toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+			"binaryDir": "${sourceDir}/__CMAKE_BUILD__/${presetName}",
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_SYSTEM_NAME": "Windows"
+			}
+		},
+
+
+
+		{
+			"name": "default-win",
+			"inherits": "default",
+			"hidden": true,
+			"displayName": "Default config (MSVC)",
+			"description": "Default config for MSVC compiler with VCPKG setup."
+		},
+		{
+			"name": "Debug-ms",
+			"inherits": "default-win",
+			"displayName": "Debug-ms",
+			"description": "Debug build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "Release-ms",
+			"inherits": "default-win",
+			"displayName": "Release-ms",
+			"description": "Release build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "RelWithDebInfo-ms",
+			"inherits": "default-win",
+			"displayName": "ReleaseWithDebugInfo-ms",
+			"description": "Release build with Debug information.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+			}
+		},
+
+
+
+		{
+			"name": "default-gcc",
+			"inherits": "default",
+			"hidden": true,
+			"displayName": "Default config (GCC)",
+			"description": "Default config for G++ compiler with VCPKG setup.",
+			"cacheVariables": {
+				"VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
+				"VCPKG_HOST_TRIPLET": "x64-mingw-dynamic",
+				"CMAKE_CXX_COMPILER": "g++"
+			}
+		},
+		{
+			"name": "Debug-gcc",
+			"inherits": "default-gcc",
+			"displayName": "Debug-gcc",
+			"description": "Debug build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "Release-gcc",
+			"inherits": "default-gcc",
+			"displayName": "Release-gcc",
+			"description": "Release build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "RelWithDebInfo-gcc",
+			"inherits": "default-gcc",
+			"displayName": "ReleaseWithDebugInfo-gcc",
+			"description": "Release build with Debug information.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+			}
+		}
+	]
+}
