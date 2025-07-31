@@ -30,10 +30,6 @@ void Sprite::Init() {
 
 
 void Sprite::LoadImage(const std::string_view& ImagePath) {
-	if (Renderer->TextureID != 0) {
-		return;
-	}
-
 	int ImageWidth, ImageHeight, ColorChannels;
 	unsigned char * ImageData = stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
 	if (!ImageData)

@@ -85,11 +85,19 @@ int main() {
 	g_ShaderProgramPtr = &g_ShaderProgram;
 
 	// Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
+	Sprite& Sprite_0 = Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
+
 	Sprite& Sprite_1 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
 	Sprite_1.Location.x = 1.f;
 
 	Sprite& Sprite_2 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
 	Sprite_2.Location.x = -1.f;
+
+	Sprite& Sprite_3 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
+	Sprite_3.Location.y = 1.f;
+
+	Sprite& Sprite_4 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
+	Sprite_4.Location.y = -1.f;
 
 	while(!glfwWindowShouldClose(Window))
 	{
