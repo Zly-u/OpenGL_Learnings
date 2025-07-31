@@ -15,6 +15,7 @@ struct TextureData
 class Sprite {
 	public:
 		Sprite();
+		Sprite(const std::string_view& ImagePath);
 		Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader);
 
 		void Init();

@@ -16,12 +16,14 @@ class ShaderProgram
 		void Render();
 
 
-	private:
-		uint32_t VBO;
-		uint32_t VAO;
-		uint32_t EBO;
+	public:
+		uint32_t VBO = 0;
+		uint32_t VAO = 0;
+		uint32_t EBO = 0;
 
-		uint32_t ShaderProgramID;
+		uint32_t TextureID = 0;
+
+		uint32_t ShaderProgramID = 0;
 
 		int32_t Uniform_VertexColorLocation;
 };

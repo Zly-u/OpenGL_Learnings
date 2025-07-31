@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "ShaderProgram.hpp"
 #include "Sprite.hpp"
 #include "include/Logging.h"
 #include <vector>
@@ -71,9 +70,10 @@ int main() {
 	glfwGetFramebufferSize(Window, &OldWidth, &OldHeight);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Sprites.emplace_back();
-	// Sprites.emplace_back("shaders/vertex.glsl", "shaders/fragment_red.glsl");
+	Sprites.emplace_back("Assets/TextureTest.png");
 
 	while(!glfwWindowShouldClose(Window))
 	{

@@ -5,9 +5,8 @@
 #include <sstream>
 #include <GLFW/glfw3.h>
 
-#include "glm/trigonometric.hpp"
-
 #include "Logging.h"
+#include "Random.h"
 
 
 ShaderProgram::ShaderProgram(const std::string_view& VertexShader, const std::string_view& FragmentShader) {
@@ -40,7 +39,7 @@ ShaderProgram::ShaderProgram(const std::string_view& VertexShader, const std::st
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
 
-	FindUniforms();
+	// FindUniforms();
 	PreparePolygon();
 }
 
@@ -53,6 +52,7 @@ ShaderProgram::~ShaderProgram() {
 
 
 void ShaderProgram::FindUniforms() {
+	// TODO: Generalized Uniforms access.
 	Uniform_VertexColorLocation = glGetUniformLocation(ShaderProgramID, "PassedColor");
 }
 
@@ -97,30 +97,32 @@ int64_t ShaderProgram::LoadShaderFromFile(const std::string_view& ShaderFile, co
 
 
 void ShaderProgram::PreparePolygon() {
+	auto Rand = [] {
+		// return Random::Normal() - 0.5f;
+		return 0.f;
+	};
 	float Vertices[] =
-	// {
-	// 	1.0f,  1.0f, 0.0f,  // top right
-	// 	1.0f, -1.0f, 0.0f,  // bottom right
-	//    -1.0f, -1.0f, 0.0f,  // bottom left
-	//    -1.0f,  1.0f, 0.0f   // top left
- //   };
 	{
+		-0.5f,  0.5f, 0.0f, // top left
+		0.0f, 1.0f, 1.0f,	// Color
+		0.0f, 0.0f,			// UV
+
 		0.5f,  0.5f, 0.0f,  // top right
-		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,	// Color
+		1.0f, 0.0f,			// UV
 
 		0.5f, -0.5f, 0.0f,  // bottom right
-		1.0f, 1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,	// Color
+		1.0f, 1.0f,			// UV
 
 	   -0.5f, -0.5f, 0.0f,  // bottom left
-		0.0f, 1.0f, 0.0f,
-
-	   -0.5f,  0.5f, 0.0f,  // top left
-		0.0f, 1.0f, 1.0f
+		0.0f, 0.0f, 1.0f,	// Color
+		0.0f, 1.0f,			// UV
 	};
 
 	unsigned int Indices[] = {
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
+		0, 1, 2,   // first triangle
+		0, 2, 3    // second triangle
 	};
 
 	glGenVertexArrays(1, &VAO);
@@ -136,21 +138,27 @@ void ShaderProgram::PreparePolygon() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
 	// Vertex Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// Vertex Color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	// Vertex UV attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 }
 
 
 void ShaderProgram::Render()
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	// float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	glUseProgram(ShaderProgramID);
 
