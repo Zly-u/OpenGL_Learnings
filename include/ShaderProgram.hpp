@@ -1,6 +1,7 @@
 #pragma once
 #include <string_view>
 #include <glad/glad.h>
+#include <glm/ext/matrix_float4x4.hpp>
 
 // TODO: Templated way of making Inputs and Outputs?
 class ShaderProgram
@@ -15,6 +16,8 @@ class ShaderProgram
 		void PreparePolygon();
 		void Render();
 
+	public:
+		void SetTranform(const glm::mat4& NewTransform);
 
 	public:
 		uint32_t VBO = 0;
@@ -26,4 +29,9 @@ class ShaderProgram
 		uint32_t ShaderProgramID = 0;
 
 		int32_t Uniform_VertexColorLocation;
+		int32_t Uniform_Transform;
+
+
+	public:
+		glm::mat4 Transform{1.f};
 };

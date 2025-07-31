@@ -73,6 +73,9 @@ int main() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	ShaderProgram g_ShaderProgram{"shaders/vertex.glsl", "shaders/fragment.glsl"};
+
+	// Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
 	Sprites.emplace_back("Assets/TextureTest.png");
 
 	while(!glfwWindowShouldClose(Window))

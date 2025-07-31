@@ -1,9 +1,10 @@
 #include "ShaderProgram.hpp"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <GLFW/glfw3.h>
 
 #include "Logging.h"
 #include "Random.h"
@@ -39,7 +40,7 @@ ShaderProgram::ShaderProgram(const std::string_view& VertexShader, const std::st
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
 
-	// FindUniforms();
+	FindUniforms();
 	PreparePolygon();
 }
 
@@ -54,6 +55,7 @@ ShaderProgram::~ShaderProgram() {
 void ShaderProgram::FindUniforms() {
 	// TODO: Generalized Uniforms access.
 	Uniform_VertexColorLocation = glGetUniformLocation(ShaderProgramID, "PassedColor");
+	Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -158,10 +160,20 @@ void ShaderProgram::Render()
 	// float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	glUseProgram(ShaderProgramID);
 
+	// TODO: Set the uniforms from some template function.
+	glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
+
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+
+void ShaderProgram::SetTranform(const glm::mat4& NewTransform)
+{
+	Transform = NewTransform;
 }

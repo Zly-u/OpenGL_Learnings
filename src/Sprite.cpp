@@ -1,16 +1,35 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "Sprite.hpp"
+
+#include <glm/ext/matrix_transform.hpp>
+
 #include "Logging.h"
 
 
 Sprite::Sprite(): Renderer("shaders/vertex.glsl", "shaders/fragment.glsl") {
-	Init();
+}
+
+Sprite::Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader): Renderer(VertexShader, FragmentShader) {
+}
+
+Sprite::Sprite(const ShaderProgram& OtherShaderProgram): Renderer(OtherShaderProgram) {
+}
+
+Sprite::Sprite(const ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath): Renderer(OtherShaderProgram) {
+	LoadImage(ImagePath);
 }
 
 Sprite::Sprite(const std::string_view& ImagePath) : Renderer("shaders/vertex.glsl", "shaders/fragment.glsl"){
-	Init();
+	LoadImage(ImagePath);
+}
 
+void Sprite::Init() {
+
+}
+
+
+void Sprite::LoadImage(const std::string_view& ImagePath) {
 	int ImageWidth, ImageHeight, ColorChannels;
 	unsigned char * ImageData = stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
 	if (!ImageData)
@@ -62,14 +81,13 @@ Sprite::Sprite(const std::string_view& ImagePath) : Renderer("shaders/vertex.gls
 	Renderer.TextureID = NewTextureID;
 }
 
-Sprite::Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader): Renderer(VertexShader, FragmentShader) {
-	Init();
-}
-
-void Sprite::Init() {
-
-}
-
 void Sprite::Render() {
+	glm::mat4 Transform{1.0f};
+
+	Transform = glm::translate(Transform, Location);
+	Transform = glm::rotate(Transform, glm::radians(Rotation), glm::vec3(0.0, 0.0, 1.0));
+	Transform = glm::scale(Transform, Scale);
+
+	Renderer.SetTranform(Transform);
 	Renderer.Render();
 }
