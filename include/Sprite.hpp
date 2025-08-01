@@ -18,7 +18,7 @@ class Sprite {
 	public:
 		Sprite();
 		Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath);
-		Sprite(const std::string_view& ImagePath);
+		Sprite(const std::string_view& ImagePath, glm::mat4* Projection);
 		Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader);
 		Sprite(ShaderProgram& OtherShaderProgram);
 
@@ -31,9 +31,11 @@ class Sprite {
 		glm::vec2 Location{0.f};
 		float ZDepth = 0.f;
 		float Rotation = 0.f;
-		glm::vec3 Scale{1.f};
+		glm::vec2 Scale{1.f};
 
 
 	private:
+		glm::vec2 SpriteTexSize;
+
 		ShaderProgram* Renderer;
 };

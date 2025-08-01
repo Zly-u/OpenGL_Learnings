@@ -1,6 +1,8 @@
 #include "ShaderProgram.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -8,6 +10,13 @@
 
 #include "Logging.h"
 #include "Random.h"
+
+
+struct VertexData {
+	glm::vec2 Position;
+	glm::vec3 Color;
+	glm::vec2 UV;
+};
 
 
 ShaderProgram::ShaderProgram(const std::string_view& VertexShader, const std::string_view& FragmentShader) {
@@ -96,23 +105,29 @@ void ShaderProgram::PreparePolygon() {
 		// return Random::Normal() - 0.5f;
 		return 0.f;
 	};
-	float Vertices[] =
+
+	static std::array<VertexData, 4> Vertices =
 	{
-		-0.5f,  0.5f, // top left
-		0.0f, 1.0f, 1.0f,	// Color
-		0.0f, 0.0f,			// UV
-
-		0.5f,  0.5f,  // top right
-		1.0f, 0.0f, 0.0f,	// Color
-		1.0f, 0.0f,			// UV
-
-		0.5f, -0.5f,  // bottom right
-		0.0f, 1.0f, 0.0f,	// Color
-		1.0f, 1.0f,			// UV
-
-	   -0.5f, -0.5f,  // bottom left
-		0.0f, 0.0f, 1.0f,	// Color
-		0.0f, 1.0f,			// UV
+		VertexData{
+			.Position = {-0.5f, 0.5f},
+			.Color = {1.0f, 1.0f, 1.0f},
+			.UV = {0.0f, 0.0f}
+		},
+		VertexData{
+			.Position = {0.5f, 0.5f},
+			.Color = {1.0f, 1.0f, 1.0f},
+			.UV = {1.0f, 0.0f}
+		},
+		VertexData{
+			.Position = {0.5f, -0.5f},
+			.Color = {1.0f, 1.0f, 1.0f},
+			.UV = {1.0f, 1.0f}
+		},
+		VertexData{
+			.Position = {-0.5f, -0.5f},
+			.Color = {1.0f, 1.0f, 1.0f},
+			.UV = {0.0f, 1.0f}
+		}
 	};
 
 	unsigned int Indices[] = {
@@ -128,23 +143,23 @@ void ShaderProgram::PreparePolygon() {
 
 	// Vertex buffer
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices.data(), GL_STATIC_DRAW);
 
 	// Element buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
-	constexpr auto AttrSetSize = 7 * sizeof(float);
+	constexpr auto AttrSetSize = sizeof(VertexData);
 	// Vertex Position attribute
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)0);
 	glEnableVertexAttribArray(0);
 
 	// Vertex Color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)offsetof(VertexData, Color));
 	glEnableVertexAttribArray(1);
 
 	// Vertex UV attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)(5 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)offsetof(VertexData, UV));
 	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
@@ -152,8 +167,9 @@ void ShaderProgram::PreparePolygon() {
 
 void ShaderProgram::FindUniforms() {
 	// TODO: Generalized Uniforms access.
+	Uniform_Texture0 = glGetUniformLocation(ShaderProgramID, "Texture0");
 	Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
-	Uniform_ZDepth = glGetUniformLocation(ShaderProgramID, "PassedZDepth");
+	Uniform_Projection = glGetUniformLocation(ShaderProgramID, "PassedProjection");
 }
 
 void ShaderProgram::Use()
@@ -163,22 +179,25 @@ void ShaderProgram::Use()
 
 void ShaderProgram::Render()
 {
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	// float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	Use();
 
-	// glActiveTexture(GL_TEXTURE0);
-	// glBindTexture(GL_TEXTURE_2D, TextureID);
-
-	// glUseProgram(ShaderProgramID);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, TextureID);
+	glUniform1i(Uniform_Texture0, 0);
 
 	// TODO: Set the uniforms from some template function.
 	glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
-	glUniform1f(Uniform_ZDepth, ZDepth);
+	glUniformMatrix4fv(Uniform_Projection, 1, GL_FALSE, glm::value_ptr(*Projection));
 
-	// glBindVertexArray(VAO);
+	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	// Unbind stuff
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
 }
 
 

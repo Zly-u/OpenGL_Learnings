@@ -6,17 +6,37 @@
 #include "Sprite.hpp"
 #include "include/Logging.h"
 #include <vector>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
 
 static const int WindowWith = 1280;
 static const int WindowHeight = 720;
 int OldWidth, OldHeight;
 
-std::vector<Sprite> Sprites;
+glm::mat4 g_Projection;
+// TODO: Camera pos is not orthographed, needs a fix
+glm::vec2 g_CameraPos{-0.5f, 0.f};
+glm::mat4 g_CameraView{1.f};
 
+std::vector<Sprite> Sprites;
 
 ShaderProgram* g_ShaderProgramPtr;
 
+void UpdateProjection() {
+	const glm::mat4 View = glm::translate(glm::mat4(1.0f), -glm::vec3(g_CameraPos, 0.f));
 
+	g_Projection = View * glm::ortho(
+		0.0f, static_cast<float>(WindowWith),   // left, right
+		static_cast<float>(WindowHeight), 0.0f, // bottom, top (flipped Y to match top-left origin)
+		-1.0f, 1.0f                             // near, far
+	);
+
+	// g_Projection = glm::ortho(
+	// 	-(float)WindowWith / 2.0f,  (float)WindowWith / 2.0f,
+	// 	-(float)WindowHeight / 2.0f, (float)WindowHeight / 2.0f,
+	// 	-1.0f, 1.0f
+	// );
+}
 
 void ProcessInput(GLFWwindow* Window) {
 	if (glfwGetKey(Window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -28,9 +48,6 @@ void ProcessInput(GLFWwindow* Window) {
 void Render(GLFWwindow* Window) {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	g_ShaderProgramPtr->Use();
-	glBindVertexArray(g_ShaderProgramPtr->VAO);
 
 	for (Sprite& Sprite : Sprites) {
 		Sprite.Render();
@@ -46,6 +63,8 @@ void WindowResizedCallback(GLFWwindow* Window, int NewWidth, int NewHeight)
 	OldHeight = NewHeight;
 
 	glViewport(0, 0, NewWidth, NewHeight);
+
+	UpdateProjection();
 
 	// Update Render on resize.
 	Render(Window);
@@ -85,37 +104,40 @@ int main() {
 	g_ShaderProgramPtr = &g_ShaderProgram;
 
 	// Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
-	Sprite& Sprite_0 = Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
+	Sprite& Sprite_0 = Sprites.emplace_back("Assets/container.jpg", &g_Projection);
+	// Sprite_0.Scale *= 1;
 
-	Sprite& Sprite_1 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
-	Sprite_1.Location.x = 1.f;
-
-	Sprite& Sprite_2 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
-	Sprite_2.Location.x = -1.f;
-
-	Sprite& Sprite_3 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
-	Sprite_3.Location.y = 1.f;
-
-	Sprite& Sprite_4 = Sprites.emplace_back(g_ShaderProgram, "Assets/TextureTest.png");
-	Sprite_4.Location.y = -1.f;
+	// Sprite& Sprite_1 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
+	// Sprite_1.Location.x = 1000.f;
+	// Sprite_1.Scale *= 1000;
+	//
+	// Sprite& Sprite_2 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
+	// Sprite_2.Location.x = -1000.f;
+	// Sprite_1.Scale *= 1000;
+	//
+	// Sprite& Sprite_3 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
+	// Sprite_3.Location.y = 1000.f;
+	// Sprite_1.Scale *= 1000;
+	//
+	// Sprite& Sprite_4 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
+	// Sprite_4.Location.y = -1000.f;
+	// Sprite_1.Scale *= 1000;
 
 	while(!glfwWindowShouldClose(Window))
 	{
 		ProcessInput(Window);
 
-		// Render(Window);
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// TODO: Figure why this doesnt propagate to Sprite and then to Renderer.
+		// TODO: Figure why sprites disapear when depth is > 1 or < -1.
+		// Sprite_1.ZDepth = glm::sin(glfwGetTime())*10.f;
 
-		g_ShaderProgram.Use();
-		glBindVertexArray(g_ShaderProgram.VAO);
-		glBindTexture(GL_TEXTURE_2D, g_ShaderProgram.TextureID);
+		UpdateProjection();
 
-		for (Sprite& Sprite : Sprites) {
-			Sprite.Render();
+		if (GLenum GlError = glGetError(); GlError != GL_NO_ERROR) {
+			Log::println("[ERROR::OpenGL] {}", GlError);
 		}
 
-		glfwSwapBuffers(Window);
+		Render(Window);
 
 		glfwPollEvents();
 	}

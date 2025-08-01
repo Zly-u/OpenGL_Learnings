@@ -29,12 +29,12 @@ class ShaderProgram
 
 		uint32_t ShaderProgramID = 0;
 
-		int32_t Uniform_VertexColorLocation;
+		int32_t Uniform_Texture0;
 		int32_t Uniform_Transform;
-		int32_t Uniform_ZDepth;
+		int32_t Uniform_Projection;
 
 
 	public:
+		glm::mat4* Projection;
 		glm::mat4 Transform{1.f};
-		float ZDepth = 0.f;
 };

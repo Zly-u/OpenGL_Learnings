@@ -2,6 +2,7 @@
 #include "stb_image.h"
 #include "Sprite.hpp"
 
+#include <GLFW/glfw3.h>
 #include <glm/ext/matrix_transform.hpp>
 
 #include "Logging.h"
@@ -20,7 +21,8 @@ Sprite::Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImageP
 	LoadImage(ImagePath);
 }
 
-Sprite::Sprite(const std::string_view& ImagePath) : Renderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")){
+Sprite::Sprite(const std::string_view& ImagePath, glm::mat4* Projection) : Renderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")){
+	Renderer->Projection = Projection;
 	LoadImage(ImagePath);
 }
 
@@ -83,15 +85,17 @@ void Sprite::LoadImage(const std::string_view& ImagePath) {
 	stbi_image_free(ImageData);
 
 	Renderer->TextureID = NewTextureID;
+	SpriteTexSize = glm::vec2(ImageWidth, ImageHeight);
 }
 
 void Sprite::Render() {
 	glm::mat4 Transform{1.0f};
 
-	Transform = glm::translate(Transform, glm::vec3(Location, 0.f));
+	Transform = glm::translate(Transform, glm::vec3(Location.x, Location.y, ZDepth));
 	Transform = glm::rotate(Transform, glm::radians(Rotation), glm::vec3(0.0, 0.0, 1.0));
-	Transform = glm::scale(Transform, Scale);
+	Transform = glm::scale(Transform, glm::vec3(Scale + SpriteTexSize, 0.f));
 
 	Renderer->SetTranform(Transform);
+
 	Renderer->Render();
 }
