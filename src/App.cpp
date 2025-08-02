@@ -47,9 +47,11 @@ std::expected<bool, std::string_view> App::Init()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	Window = glfwCreateWindow(
-		WindowSize.x, WindowSize.y,
+		WindowSize.x,
+		WindowSize.y,
 		"OpenGL Learnings",
-		nullptr, nullptr
+		nullptr,
+		nullptr
 	);
 	if (Window == nullptr)
 	{
@@ -79,13 +81,13 @@ void App::PostInit()
 {
 	Sprites.reserve(100);
 
-	Sprite& Sprite_0 = Sprites.emplace_back("Assets/container.jpg");
-	// Sprite_0.Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
-	// Sprite_0.Name = "Box";
+	Sprite& Sprite_0  = Sprites.emplace_back("Assets/container.jpg");
+	Sprite_0.Name     = "Box";
+	Sprite_0.Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
 
-	// Sprite& Sprite_1 = Sprites.emplace_back("Assets/TextureTest.png");
-	// Sprite_1.Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
-	// Sprite_1.Name = "Guy";
+	Sprite& Sprite_1  = Sprites.emplace_back("Assets/TextureTest.png");
+	Sprite_1.Name     = "Guy";
+	Sprite_1.Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
 }
 
 

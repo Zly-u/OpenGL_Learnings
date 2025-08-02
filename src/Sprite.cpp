@@ -8,18 +8,34 @@
 #include "Logging.h"
 #include "Random.h"
 
+// clang-format off
+constexpr std::array<Sprite::SpriteVertexData, 4> SpriteVertices = {
+	Sprite::SpriteVertexData
+	{
+		.Position = { -.5f, .5f },
+		.Color    = { 1.0f, 1.0f, 1.0f },
+		.UV       = { 0.0f, 0.0f }
+	},
+	{
+		.Position = { .5f, .5f },
+		.Color    = { 1.0f, 1.0f, 1.0f },
+		.UV       = { 1.0f, 0.0f }
+	},
+	{
+		.Position = { .5f, -.5f },
+		.Color    = { 1.0f, 1.0f, 1.0f },
+		.UV       = { 1.0f, 1.0f }
+	},
+	{
+		.Position = { -.5f, -.5f },
+		.Color    = { 1.0f, 1.0f, 1.0f },
+		.UV       = { 0.0f, 1.0f }
+	}
+};
+// clang-format on
 
-Sprite::Sprite() : SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl"))
-{
-}
-
-
-Sprite::Sprite(const std::string_view& ImagePath) : SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl"))
-{
-	LoadImage(ImagePath);
-}
-
-Sprite::Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath) : SpriteRenderer(&OtherShaderProgram)
+Sprite::Sprite(const std::string_view& ImagePath)
+	: SpriteRenderer(new SpriteSP("shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices))
 {
 	LoadImage(ImagePath);
 }

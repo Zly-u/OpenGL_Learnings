@@ -1,13 +1,25 @@
 #pragma once
 
 #include "Sprite.hpp"
-#include "glm/matrix.hpp"
 
 #include <GLFW/glfw3.h>
 #include <vector>
 
 class Renderer
 {
+	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
+	using UVAttribute       = GLMVertexAttribute<1, glm::vec2>;
+
+	public:
+		struct ScreenVertexData
+		{
+			glm::vec2 Position;
+			glm::vec2 UV;
+		};
+
+		using ScreenSP = ShaderProgram<ScreenVertexData, PositionAttribute, UVAttribute>;
+
+
 	public:
 		Renderer();
 		~Renderer();
@@ -25,12 +37,10 @@ class Renderer
 
 
 	private:
+		ScreenSP ScreenRenderer;
+
 		uint32_t FrameBufferObject = 0;
 		uint32_t FrameBufferTexture_Color = 0;
 
 		uint32_t RenderBufferObject_DepthAndStencil = 0;
-
-
-	private:
-		ShaderProgram ScreenRenderer;
 };

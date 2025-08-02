@@ -1,27 +1,27 @@
 #pragma once
 
-#include <array>
+#include "Rendering/ShaderProgram.hpp"
+
 #include <string>
 
-#include "ShaderProgram.hpp"
-#include "glm/vec2.hpp"
-#include "glm/vec4.hpp"
-#include "glm/matrix.hpp"
-
-struct TextureData
-{
-	// TODO: Utilize this for dynamically changing polygons?
-	std::array<glm::vec2, 4> UVs;
-	std::array<glm::vec4, 4> VertexColors;
-};
 
 class Sprite {
+	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
+	using ColorAttribute    = GLMVertexAttribute<1, glm::vec3>;
+	using UVAttribute       = GLMVertexAttribute<2, glm::vec2>;
+
 	public:
-		Sprite();
+		struct SpriteVertexData
+		{
+			glm::vec2 Position;
+			glm::vec3 Color;
+			glm::vec2 UV;
+		};
+
+		using SpriteSP = ShaderProgram<SpriteVertexData, PositionAttribute, ColorAttribute, UVAttribute>;
+
+	public:
 		explicit Sprite(const std::string_view& ImagePath);
-		Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath);
-		Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader);
-		Sprite(ShaderProgram& OtherShaderProgram);
 
 		void Init();
 		void LoadImage(const std::string_view& ImagePath);
@@ -41,5 +41,5 @@ class Sprite {
 		float ZDepth = 0.f;
 
 	private:
-		ShaderProgram* SpriteRenderer;
+		SpriteSP* SpriteRenderer;
 };

@@ -1,4 +1,4 @@
-#include "Renderer.hpp"
+#include "Rendering/Renderer.hpp"
 
 #include "App.hpp"
 #include "Logging.h"
@@ -6,21 +6,28 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+// clang-format off
 // Different positions and UVs are flipped due to how Framebuffer stores data.
-const static std::array<VertexData, 4> ScreenVertices = {
-	VertexData{ .Position = { -1.f, 1.f },
-			   .Color    = { 1.0f, 1.0f, 1.0f },
-			   .UV       = { 0.0f, 1.0f } },
-	VertexData{ .Position = { 1.f, 1.f },
-			   .Color    = { 1.0f, 1.0f, 1.0f },
-			   .UV       = { 1.0f, 1.0f } },
-	VertexData{ .Position = { 1.f, -1.f },
-			   .Color    = { 1.0f, 1.0f, 1.0f },
-			   .UV       = { 1.0f, 0.0f } },
-	VertexData{ .Position = { -1.f, -1.f },
-			   .Color    = { 1.0f, 1.0f, 1.0f },
-			   .UV       = { 0.0f, 0.0f } }
+constexpr std::array<Renderer::ScreenVertexData, 4> ScreenVertices = {
+	Renderer::ScreenVertexData
+	{
+		.Position = { -1.f, 1.f },
+		.UV       = { 0.0f, 1.0f }
+	},
+	{
+		.Position = { 1.f, 1.f },
+		.UV       = { 1.0f, 1.0f }
+	},
+	{
+		.Position = { 1.f, -1.f },
+		.UV       = { 1.0f, 0.0f }
+	},
+	{
+		.Position = { -1.f, -1.f },
+		.UV       = { 0.0f, 0.0f }
+	}
 };
+// clang-format on
 
 Renderer::Renderer()
 	: ScreenRenderer(
@@ -140,7 +147,7 @@ void Renderer::Render(GLFWwindow* Window, std::vector<Sprite>& Sprites)
 		glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
 		glUniform1i(glGetUniformLocation(ScreenRenderer.ShaderProgramID, "ScreenTexture"), 0);
 
-		glBindVertexArray(ScreenRenderer.VAO);
+		ScreenRenderer.VAO.Bind();
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
