@@ -15,12 +15,10 @@ static int WindowHeight = 720;
 glm::mat4 g_Projection;
 glm::mat4 g_ViewProjection;
 
-glm::vec2 g_CameraPos{-100.f, 0.f};
+glm::vec2 g_CameraPos{0.f, 0.f};
 glm::mat4 g_CameraView{1.f};
 
 std::vector<Sprite> Sprites;
-
-ShaderProgram* g_ShaderProgramPtr;
 
 void UpdateProjection() {
 	g_CameraView = glm::translate(glm::mat4(1.0f), -glm::vec3(g_CameraPos, 0.f));
@@ -28,7 +26,7 @@ void UpdateProjection() {
 	g_Projection = glm::ortho(
 		0.0f, static_cast<float>(WindowWidth),   // left, right
 		static_cast<float>(WindowHeight), 0.0f,	// bottom, top (flipped Y to match top-left origin)
-		-1.0f, 1.0f									// near, far
+		-1000.0f, 1000.0f									// near, far
 	) * g_CameraView;
 
 	g_ViewProjection = g_Projection * g_CameraView;
@@ -68,6 +66,8 @@ void WindowResizedCallback(GLFWwindow* Window, int NewWidth, int NewHeight)
 
 
 int main() {
+	Sprites.reserve(10);
+
 	glfwInit();
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -96,44 +96,31 @@ int main() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	ShaderProgram g_ShaderProgram{"shaders/vertex.glsl", "shaders/fragment.glsl"};
-	g_ShaderProgramPtr = &g_ShaderProgram;
-
 	// Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
 	Sprite& Sprite_0 = Sprites.emplace_back("Assets/container.jpg", &g_Projection);
-	// Sprite_0.Scale *= 1;
+	Sprite_0.Location = glm::vec2(WindowWidth / 1.5f, WindowHeight / 2.f);
+	Sprite_0.Name = "Box";
 
-	// Sprite& Sprite_1 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
-	// Sprite_1.Location.x = 1000.f;
-	// Sprite_1.Scale *= 1000;
-	//
+	Sprite& Sprite_1 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
+	Sprite_1.Location = glm::vec2(WindowWidth / 3.f, WindowHeight / 2.f);
+	Sprite_1.Name = "Guy";
+	
 	// Sprite& Sprite_2 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
-	// Sprite_2.Location.x = -1000.f;
-	// Sprite_1.Scale *= 1000;
-	//
 	// Sprite& Sprite_3 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
-	// Sprite_3.Location.y = 1000.f;
-	// Sprite_1.Scale *= 1000;
-	//
 	// Sprite& Sprite_4 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
-	// Sprite_4.Location.y = -1000.f;
-	// Sprite_1.Scale *= 1000;
 
 	while(!glfwWindowShouldClose(Window))
 	{
 		ProcessInput(Window);
 
-		// TODO: Figure why this doesnt propagate to Sprite and then to Renderer.
-		// TODO: Figure why sprites disapear when depth is > 1 or < -1.
-		// Sprite_1.ZDepth = glm::sin(glfwGetTime())*10.f;
+		Sprite_0.ZDepth = glm::sin(glfwGetTime() * 10.f) * 10.f;
 
 		UpdateProjection();
+		Render(Window);
 
 		if (GLenum GlError = glGetError(); GlError != GL_NO_ERROR) {
 			Log::println("[ERROR::OpenGL] {}", GlError);
 		}
-
-		Render(Window);
 
 		glfwPollEvents();
 	}

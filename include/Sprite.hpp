@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 
 #include "ShaderProgram.hpp"
 #include "glm/vec2.hpp"
@@ -28,14 +29,15 @@ class Sprite {
 
 
 	public:
+		std::string Name;
+		glm::vec2 SpriteTexSize{0.f};
+
 		glm::vec2 Location{0.f};
-		float ZDepth = 0.f;
 		float Rotation = 0.f;
 		glm::vec2 Scale{1.f};
 
+		float ZDepth = 0.f;
 
 	private:
-		glm::vec2 SpriteTexSize{0.f};
-
 		ShaderProgram* Renderer;
 };

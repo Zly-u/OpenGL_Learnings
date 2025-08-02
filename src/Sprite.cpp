@@ -6,6 +6,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "Logging.h"
+#include "Random.h"
 
 
 Sprite::Sprite(): Renderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")) {
@@ -33,7 +34,7 @@ void Sprite::Init() {
 
 void Sprite::LoadImage(const std::string_view& ImagePath) {
 	stbi_set_flip_vertically_on_load(true);
-	
+
 	int ImageWidth, ImageHeight, ColorChannels;
 	unsigned char * ImageData = stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
 	if (!ImageData)
