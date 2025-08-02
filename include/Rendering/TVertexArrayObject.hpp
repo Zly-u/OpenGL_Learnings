@@ -3,6 +3,10 @@
 #include "GlmTypeTraits.hpp"
 #include <tuple>
 
+
+/*
+ * For generic types.
+ */
 template<GLuint AttrLocation, GLint TypeSize, GLenum AttrType, GLboolean TypeNormalized = GL_FALSE>
 struct VertexAttribute
 {
@@ -13,7 +17,9 @@ struct VertexAttribute
 };
 
 
-
+/*
+ * For GLM types, such as glm::vec2, glm::vec3, glm::mat4, etc.
+ */
 template<GLuint AttrLocation, typename TGlmType, GLboolean TypeNormalized = GL_FALSE>
 struct GLMVertexAttribute
 {
@@ -25,11 +31,16 @@ struct GLMVertexAttribute
 };
 
 
+/*
+ * VertexArrayObject Class that auto generates all Attributes for usage in Shaders.
+ */
 template<typename VertexDataStruct, typename... TAttributes>
 struct VertexArrayObject
 {
 	public:
 		using VertexDataType = VertexDataStruct;
+
+		// -------------------------------------------------------------------------------
 
 	public:
 		explicit VertexArrayObject()
@@ -41,19 +52,24 @@ struct VertexArrayObject
 			glGenVertexArrays(1, &ID);
 		}
 
+
 		explicit VertexArrayObject(const GLuint NewVAO) : ID(NewVAO) {}
+
 
 		void operator=(const GLuint NewVAO)
 		{
 			ID = NewVAO;
 		}
 
+
 		~VertexArrayObject()
 		{
 			glDeleteVertexArrays(1, &ID);
 		}
 
+
 		// -------------------------------------------------------------------------------
+
 
 		void SetupVertexAttributes() {
 			Bind();
@@ -61,28 +77,33 @@ struct VertexArrayObject
 			SetupVertexAttributesImpl(Stride);
 		}
 
-		constexpr GLsizei CalculateTotalStride() const
-		{
-			return sizeof(VertexDataType);
-		}
-
-		// Get attribute location by type (compile-time)
-		template<typename AttributeType>
-		constexpr GLuint GetAttributeLocation() const {
-			return AttributeType::Location;
-		}
 
 		void Bind() const
 		{
 			glBindVertexArray(ID);
 		}
 
+
 		static void Unbind()
 		{
 			glBindVertexArray(0);
 		}
 
+		// -------------------------------------------------------------------------------
+
 	private:
+		constexpr GLsizei CalculateTotalStride() const
+		{
+			return sizeof(VertexDataType);
+		}
+
+
+		template<typename AttributeType>
+		constexpr GLuint GetAttributeLocation() const {
+			return AttributeType::Location;
+		}
+
+
 		template<std::size_t I = 0>
 		void SetupVertexAttributesImpl(const GLsizei Stride, const size_t CurrentOffset = 0) {
 			if constexpr (I < sizeof...(TAttributes))
@@ -125,6 +146,7 @@ struct VertexArrayObject
 			return TypeSize * Attribute::Size;
 		}
 
+		// -------------------------------------------------------------------------------
 
 	private:
 		GLuint ID;

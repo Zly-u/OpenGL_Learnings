@@ -7,10 +7,7 @@
 #include <glm/vec4.hpp>
 
 template<typename T>
-struct GLMTypeTrait
-{
-
-};
+struct GLMTypeTrait { };
 
 template<>
 struct GLMTypeTrait<glm::vec2> {

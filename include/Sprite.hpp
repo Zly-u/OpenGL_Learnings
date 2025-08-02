@@ -5,7 +5,8 @@
 #include <string>
 
 
-class Sprite {
+class Sprite
+{
 	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
 	using ColorAttribute    = GLMVertexAttribute<1, glm::vec3>;
 	using UVAttribute       = GLMVertexAttribute<2, glm::vec2>;
@@ -39,6 +40,7 @@ class Sprite {
 		glm::vec2 Scale{1.f};
 
 		float ZDepth = 0.f;
+
 
 	private:
 		SpriteSP* SpriteRenderer;

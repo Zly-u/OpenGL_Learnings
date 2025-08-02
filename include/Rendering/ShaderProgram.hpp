@@ -17,7 +17,6 @@
 #include <glm/ext/matrix_float4x4.hpp>
 #include <string_view>
 
-
 // template<typename UniformType, const char* UniformName>
 // struct Uniform
 // {
@@ -36,29 +35,32 @@ class ShaderProgram
 {
 	public:
 		ShaderProgram(
-			const std::string_view&          VertexShader,
-			const std::string_view&          FragmentShader,
+			const std::string_view&              VertexShader,
+			const std::string_view&              FragmentShader,
 			const std::array<VertexDataType, 4>& NewVertices
-		) : Vertices(NewVertices)
+		) :
+			Vertices(NewVertices)
 		{
 			PrepareShaders(VertexShader, FragmentShader);
 			FindUniforms();
 			PreparePolygon();
 		}
 
-		~ShaderProgram(){
+		~ShaderProgram()
+		{
 			glDeleteBuffers(1, &VBO);
 			glDeleteBuffers(1, &EBO);
 		}
 
 		// ---------------------------------------------------------------------------------------
 
-		void Use(){
+		void Use()
+		{
 			glUseProgram(ShaderProgramID);
 		}
 
-
-		void Render(const glm::mat4& Projection){
+		void Render(const glm::mat4& Projection)
+		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			Use();
@@ -68,10 +70,15 @@ class ShaderProgram
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureID);
 
-			glUniform1i(Uniform_Texture_0, 0); // 0 corresponds to GL_TEXTURE0
+			glUniform1i(Uniform_Texture_0, 0);    // 0 corresponds to GL_TEXTURE0
 
 			glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
-			glUniformMatrix4fv(Uniform_Projection, 1, GL_FALSE, glm::value_ptr(Projection));
+			glUniformMatrix4fv(
+				Uniform_Projection,
+				1,
+				GL_FALSE,
+				glm::value_ptr(Projection)
+			);
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -83,13 +90,15 @@ class ShaderProgram
 
 
 	public:
-		void SetTransform(const glm::mat4& NewTransform){
+		void SetTransform(const glm::mat4& NewTransform)
+		{
 			Transform = NewTransform;
 		}
 
 	private:
 		int64_t
-		LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType){
+		LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType)
+		{
 			std::ifstream infile(ShaderFile.data());
 
 			if (infile.fail())
@@ -127,11 +136,14 @@ class ShaderProgram
 
 			return NewShaderID;
 		}
+
 		void PrepareShaders(
 			const std::string_view& VertexShader,
 			const std::string_view& FragmentShader
-			){
-			const int64_t VertexShaderID = LoadShaderFromFile(VertexShader, GL_VERTEX_SHADER);
+		)
+		{
+			const int64_t VertexShaderID =
+				LoadShaderFromFile(VertexShader, GL_VERTEX_SHADER);
 			if (VertexShaderID == -1)
 			{
 				return;
@@ -169,13 +181,15 @@ class ShaderProgram
 		{
 			Uniform_Texture_0 = glGetUniformLocation(ShaderProgramID, "Texture0");
 			Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
-			Uniform_Projection = glGetUniformLocation(ShaderProgramID, "PassedProjection");
+			Uniform_Projection =
+				glGetUniformLocation(ShaderProgramID, "PassedProjection");
 		}
 
-		void PreparePolygon(){
+		void PreparePolygon()
+		{
 			static const uint32_t Indices[] = {
-				0, 1, 2,   // first triangle
-				0, 2, 3    // second triangle
+				0, 1, 2,    // first triangle
+				0, 2, 3     // second triangle
 			};
 
 			glGenBuffers(1, &VBO);
@@ -185,11 +199,21 @@ class ShaderProgram
 
 			// Vertex buffer
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices.data(), GL_STATIC_DRAW);
+			glBufferData(
+				GL_ARRAY_BUFFER,
+				sizeof(Vertices),
+				Vertices.data(),
+				GL_STATIC_DRAW
+			);
 
 			// Element buffer
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+			glBufferData(
+				GL_ELEMENT_ARRAY_BUFFER,
+				sizeof(Indices),
+				Indices,
+				GL_STATIC_DRAW
+			);
 
 			VAO.SetupVertexAttributes();
 
