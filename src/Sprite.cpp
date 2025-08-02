@@ -9,24 +9,18 @@
 #include "Random.h"
 
 
-Sprite::Sprite(): SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")) {
+Sprite::Sprite() : SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl"))
+{
 }
 
 
-Sprite::Sprite(const std::string_view& ImagePath) : SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")){
+Sprite::Sprite(const std::string_view& ImagePath) : SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl"))
+{
 	LoadImage(ImagePath);
 }
 
-
-Sprite::Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader): SpriteRenderer(new ShaderProgram(VertexShader, FragmentShader)) {
-}
-
-
-Sprite::Sprite(ShaderProgram& OtherShaderProgram): SpriteRenderer(&OtherShaderProgram) {
-}
-
-
-Sprite::Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath): SpriteRenderer(&OtherShaderProgram) {
+Sprite::Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath) : SpriteRenderer(&OtherShaderProgram)
+{
 	LoadImage(ImagePath);
 }
 

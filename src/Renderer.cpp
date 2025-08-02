@@ -1,16 +1,95 @@
 #include "Renderer.hpp"
 
+#include "App.hpp"
+#include "Logging.h"
+
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+// Different positions and UVs are flipped due to how Framebuffer stores data.
+const static std::array<VertexData, 4> ScreenVertices = {
+	VertexData{ .Position = { -1.f, 1.f },
+			   .Color    = { 1.0f, 1.0f, 1.0f },
+			   .UV       = { 0.0f, 1.0f } },
+	VertexData{ .Position = { 1.f, 1.f },
+			   .Color    = { 1.0f, 1.0f, 1.0f },
+			   .UV       = { 1.0f, 1.0f } },
+	VertexData{ .Position = { 1.f, -1.f },
+			   .Color    = { 1.0f, 1.0f, 1.0f },
+			   .UV       = { 1.0f, 0.0f } },
+	VertexData{ .Position = { -1.f, -1.f },
+			   .Color    = { 1.0f, 1.0f, 1.0f },
+			   .UV       = { 0.0f, 0.0f } }
+};
 
 Renderer::Renderer()
+	: ScreenRenderer(
+		"shaders/vertex_screen.glsl",
+		"shaders/fragment_screen.glsl",
+		ScreenVertices
+	)
 {
+	const glm::vec2& WindowSize = App::Get().GetWindowSize();
+
+	// -----------------------------------------------------------------------------------
+
+	// Frame Buffer Object
+
+	glGenFramebuffers(1, &FrameBufferObject);
+	glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
+
+	glGenTextures(1, &FrameBufferTexture_Color);
+	glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
+	glTexImage2D(
+		GL_TEXTURE_2D, 0, GL_RGB,
+		WindowSize.x, WindowSize.y,
+		0,
+		GL_RGB, GL_UNSIGNED_BYTE,
+		nullptr
+	);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glFramebufferTexture2D(
+		GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+		FrameBufferTexture_Color, 0
+	);
+
+	// -----------------------------------------------------------------------------------
+
+	// Render Buffer Object
+
+	glGenRenderbuffers(1, &RenderBufferObject_DepthAndStencil);
+	glBindRenderbuffer(GL_RENDERBUFFER, RenderBufferObject_DepthAndStencil);
+	glRenderbufferStorage(
+		GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
+		WindowSize.x, WindowSize.y
+	);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glFramebufferRenderbuffer(
+		GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
+		RenderBufferObject_DepthAndStencil
+	);
+
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		Log::println("[ERROR] Framebuffer is incomplete.");
+		return;
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// -----------------------------------------------------------------------------------
 }
 
 
 Renderer::~Renderer()
 {
+	glDeleteRenderbuffers(1, &RenderBufferObject_DepthAndStencil);
+	glDeleteFramebuffers(1, &FrameBufferObject);
 }
 
 
@@ -31,12 +110,39 @@ void Renderer::UpdateProjection(const glm::vec2& WindowSize)
 
 void Renderer::Render(GLFWwindow* Window, std::vector<Sprite>& Sprites)
 {
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for (Sprite& Sprite : Sprites)
+	// First pass - render scene
 	{
-		Sprite.Render(Projection);
+		glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
+		glEnable(GL_DEPTH_TEST);
+
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		for (Sprite& Sprite : Sprites)
+		{
+			Sprite.Render(Projection);
+		}
+	}
+
+	glBindVertexArray(0);
+
+	// Second pass - display rendered scene on a screen polygon
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+		glDisable(GL_DEPTH_TEST);
+
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		ScreenRenderer.Use();
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
+		glUniform1i(glGetUniformLocation(ScreenRenderer.ShaderProgramID, "ScreenTexture"), 0);
+
+		glBindVertexArray(ScreenRenderer.VAO);
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 
 	glfwSwapBuffers(Window);

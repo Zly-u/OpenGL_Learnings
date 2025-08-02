@@ -10,7 +10,7 @@
 
 struct TextureData
 {
-	// TODO: Utilize this?
+	// TODO: Utilize this for dynamically changing polygons?
 	std::array<glm::vec2, 4> UVs;
 	std::array<glm::vec4, 4> VertexColors;
 };
@@ -32,7 +32,7 @@ class Sprite {
 
 	public:
 		std::string Name;
-		glm::vec2 SpriteTexSize{0.f};
+		glm::vec2 SpriteTexSize{1.f};
 
 		glm::vec2 Location{0.f};
 		float Rotation = 0.f;

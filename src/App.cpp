@@ -22,6 +22,7 @@ App::App()
 {
 }
 
+
 App::~App()
 {
 	glfwTerminate();
@@ -56,6 +57,7 @@ std::expected<bool, std::string_view> App::Init()
 		return std::unexpected("Failed to create GLFW window.");
 	}
 	glfwMakeContextCurrent(Window);
+	glfwSetWindowSizeCallback(Window, WindowResizedCallbackWrapper);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -63,12 +65,11 @@ std::expected<bool, std::string_view> App::Init()
 		return std::unexpected("Failed to initialize GLAD.");
 	}
 
-	glfwSetWindowSizeCallback(Window, WindowResizedCallbackWrapper);
-	// glfwGetFramebufferSize(Window, &WindowSize.x, &WindowSize.y);
-
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	TheRenderer = std::make_unique<Renderer>();
 
 	return true;
 }
@@ -79,25 +80,12 @@ void App::PostInit()
 	Sprites.reserve(100);
 
 	Sprite& Sprite_0 = Sprites.emplace_back("Assets/container.jpg");
-	Sprite_0.Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
-	Sprite_0.Name = "Box";
-
-	Sprite& Sprite_1 = Sprites.emplace_back("Assets/TextureTest.png");
-	Sprite_1.Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
-	Sprite_1.Name = "Guy";
-
-	// Sprites.emplace_back(g_ShaderProgram, "Assets/container.jpg");
-	// Sprite& Sprite_0 = Sprites.emplace_back("Assets/container.jpg", &g_Projection);
-	// Sprite_0.Location = glm::vec2(WindowWidth / 1.5f, WindowHeight / 2.f);
+	// Sprite_0.Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
 	// Sprite_0.Name = "Box";
-	//
-	// Sprite& Sprite_1 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
-	// Sprite_1.Location = glm::vec2(WindowWidth / 3.f, WindowHeight / 2.f);
-	// Sprite_1.Name = "Guy";
 
-	// Sprite& Sprite_2 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
-	// Sprite& Sprite_3 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
-	// Sprite& Sprite_4 = Sprites.emplace_back("Assets/TextureTest.png", &g_Projection);
+	// Sprite& Sprite_1 = Sprites.emplace_back("Assets/TextureTest.png");
+	// Sprite_1.Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
+	// Sprite_1.Name = "Guy";
 }
 
 
@@ -108,16 +96,18 @@ void App::WindowResizedCallback(const int NewWidth, const int NewHeight)
 
 	glViewport(0, 0, NewWidth, NewHeight);
 
-	TheRenderer.UpdateProjection(BaseWindowSize);
+	TheRenderer->UpdateProjection(BaseWindowSize);
 
 	// Update Render on resize.
-	TheRenderer.Render(Window, Sprites);
+	TheRenderer->Render(Window, Sprites);
 }
+
 
 const glm::vec2& App::GetWindowSize() const
 {
 	return WindowSize;
 }
+
 
 void App::ProcessInput()
 {
@@ -127,6 +117,7 @@ void App::ProcessInput()
 	}
 }
 
+
 void App::Update(const float DeltaTime)
 {
 	for (Sprite& Sprite : Sprites)
@@ -134,6 +125,7 @@ void App::Update(const float DeltaTime)
 		Sprite.Update(DeltaTime);
 	}
 }
+
 
 void App::GameLoop()
 {
@@ -145,8 +137,8 @@ void App::GameLoop()
 
 		Update(DeltaTime);
 
-		TheRenderer.UpdateProjection(BaseWindowSize);
-		TheRenderer.Render(Window, Sprites);
+		TheRenderer->UpdateProjection(BaseWindowSize);
+		TheRenderer->Render(Window, Sprites);
 
 		if (GLenum GlError = glGetError(); GlError != GL_NO_ERROR)
 		{
@@ -156,6 +148,7 @@ void App::GameLoop()
 		glfwPollEvents();
 	}
 }
+
 
 void App::UpdateDeltaTime()
 {

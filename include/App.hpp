@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <expected>
 #include <glm/vec2.hpp>
+#include <memory>
 #include <string_view>
 
 class App {
@@ -47,7 +48,7 @@ class App {
 
 	private:
 		GLFWwindow* Window = nullptr;
-		Renderer TheRenderer;
+		std::unique_ptr<Renderer> TheRenderer;
 
 		float DeltaTime = 0.f;
 		float PreviousFrameTime = 0.f;

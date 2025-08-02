@@ -5,54 +5,32 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 #include "Logging.h"
 #include "Random.h"
 
 
-struct VertexData {
-	glm::vec2 Position;
-	glm::vec3 Color;
-	glm::vec2 UV;
-};
-
-
-ShaderProgram::ShaderProgram(const std::string_view& VertexShader, const std::string_view& FragmentShader) {
-	const int64_t VertexShaderID = LoadShaderFromFile(VertexShader, GL_VERTEX_SHADER);
-	if (VertexShaderID == -1) {
-		return;
-	}
-
-	const int64_t FragmentShaderID = LoadShaderFromFile(FragmentShader, GL_FRAGMENT_SHADER);
-	if (FragmentShaderID == -1) {
-		return;
-	}
-
-	ShaderProgramID = glCreateProgram();
-	glAttachShader(ShaderProgramID, VertexShaderID);
-	glAttachShader(ShaderProgramID, FragmentShaderID);
-	glLinkProgram(ShaderProgramID);
-
-	int Success;
-	glGetProgramiv(ShaderProgramID, GL_LINK_STATUS, &Success);
-	if(!Success) {
-		char infoLog[512];
-		glGetProgramInfoLog(ShaderProgramID, 512, nullptr, infoLog);
-
-		Log::println("ERROR::SHADERPROGRAM::LINKING_FAILED: {}", infoLog);
-
-		return;
-	}
-
-	glDeleteShader(VertexShaderID);
-	glDeleteShader(FragmentShaderID);
-
+ShaderProgram::ShaderProgram(
+	const std::string_view& VertexShader,
+	const std::string_view& FragmentShader
+)
+{
+	PrepareShaders(VertexShader, FragmentShader);
 	FindUniforms();
 	PreparePolygon();
 }
 
+ShaderProgram::ShaderProgram(
+	const std::string_view&    VertexShader,
+	const std::string_view&    FragmentShader,
+	const std::array<VertexData, 4>& NewVertices
+) : Vertices(NewVertices)
+{
+	PrepareShaders(VertexShader, FragmentShader);
+	FindUniforms();
+	PreparePolygon();
+}
 
 ShaderProgram::~ShaderProgram() {
 	glDeleteVertexArrays(1, &VAO);
@@ -62,10 +40,15 @@ ShaderProgram::~ShaderProgram() {
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-int64_t ShaderProgram::LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) {
+int64_t ShaderProgram::LoadShaderFromFile(
+	const std::string_view& ShaderFile,
+	const GLenum            ShaderType
+)
+{
 	std::ifstream infile(ShaderFile.data());
 
-	if(infile.fail()) {
+	if (infile.fail())
+	{
 		Log::println("Error opening shader file: {}", ShaderFile);
 		return -1;
 	}
@@ -74,7 +57,7 @@ int64_t ShaderProgram::LoadShaderFromFile(const std::string_view& ShaderFile, co
 	Buffer_ShaderShader << infile.rdbuf();
 	std::string ShaderContent = Buffer_ShaderShader.str();
 
-	const char* VertexShaderData = ShaderContent.c_str();
+	const char* VertexShaderData      = ShaderContent.c_str();
 	const GLint VertexShaderData_Size = static_cast<GLint>(ShaderContent.size());
 
 	const GLuint NewShaderID = glCreateShader(ShaderType);
@@ -83,7 +66,8 @@ int64_t ShaderProgram::LoadShaderFromFile(const std::string_view& ShaderFile, co
 
 	int Success;
 	glGetShaderiv(NewShaderID, GL_COMPILE_STATUS, &Success);
-	if (!Success) {
+	if (!Success)
+	{
 		char infoLog[512];
 		glGetShaderInfoLog(NewShaderID, 512, nullptr, infoLog);
 
@@ -99,6 +83,44 @@ int64_t ShaderProgram::LoadShaderFromFile(const std::string_view& ShaderFile, co
 	return NewShaderID;
 }
 
+void ShaderProgram::PrepareShaders(
+	const std::string_view& VertexShader,
+	const std::string_view& FragmentShader
+)
+{
+	const int64_t VertexShaderID = LoadShaderFromFile(VertexShader, GL_VERTEX_SHADER);
+	if (VertexShaderID == -1)
+	{
+		return;
+	}
+
+	const int64_t FragmentShaderID =
+		LoadShaderFromFile(FragmentShader, GL_FRAGMENT_SHADER);
+	if (FragmentShaderID == -1)
+	{
+		return;
+	}
+
+	ShaderProgramID = glCreateProgram();
+	glAttachShader(ShaderProgramID, VertexShaderID);
+	glAttachShader(ShaderProgramID, FragmentShaderID);
+	glLinkProgram(ShaderProgramID);
+
+	int Success;
+	glGetProgramiv(ShaderProgramID, GL_LINK_STATUS, &Success);
+	if (!Success)
+	{
+		char infoLog[512];
+		glGetProgramInfoLog(ShaderProgramID, 512, nullptr, infoLog);
+
+		Log::println("ERROR::SHADERPROGRAM::LINKING_FAILED: {}", infoLog);
+
+		return;
+	}
+
+	glDeleteShader(VertexShaderID);
+	glDeleteShader(FragmentShaderID);
+}
 
 void ShaderProgram::PreparePolygon() {
 	auto Rand = [] {
@@ -106,31 +128,7 @@ void ShaderProgram::PreparePolygon() {
 		return 0.f;
 	};
 
-	static std::array<VertexData, 4> Vertices =
-	{
-		VertexData{
-			.Position = {-0.5f, 0.5f},
-			.Color = {1.0f, 1.0f, 1.0f},
-			.UV = {0.0f, 0.0f}
-		},
-		VertexData{
-			.Position = {0.5f, 0.5f},
-			.Color = {1.0f, 1.0f, 1.0f},
-			.UV = {1.0f, 0.0f}
-		},
-		VertexData{
-			.Position = {0.5f, -0.5f},
-			.Color = {1.0f, 1.0f, 1.0f},
-			.UV = {1.0f, 1.0f}
-		},
-		VertexData{
-			.Position = {-0.5f, -0.5f},
-			.Color = {1.0f, 1.0f, 1.0f},
-			.UV = {0.0f, 1.0f}
-		}
-	};
-
-	unsigned int Indices[] = {
+	constexpr uint32_t Indices[] = {
 		0, 1, 2,   // first triangle
 		0, 2, 3    // second triangle
 	};
@@ -150,6 +148,7 @@ void ShaderProgram::PreparePolygon() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
 	constexpr auto AttrSetSize = sizeof(VertexData);
+
 	// Vertex Position attribute
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, AttrSetSize, (void*)0);
 	glEnableVertexAttribArray(0);
@@ -185,14 +184,16 @@ void ShaderProgram::Render(const glm::mat4& Projection)
 
 	Use();
 
+	glBindVertexArray(VAO);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
+
 	glUniform1i(Uniform_Texture_0, 0); // 0 corresponds to GL_TEXTURE0
 
 	glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
 	glUniformMatrix4fv(Uniform_Projection, 1, GL_FALSE, glm::value_ptr(Projection));
 
-	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	// Unbind stuff
