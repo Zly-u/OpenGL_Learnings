@@ -9,13 +9,13 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-static const int WindowWith = 1280;
-static const int WindowHeight = 720;
-int OldWidth, OldHeight;
+static int WindowWidth = 1280;
+static int WindowHeight = 720;
 
 glm::mat4 g_Projection;
-// TODO: Camera pos is not orthographed, needs a fix
-glm::vec2 g_CameraPos{-0.5f, 0.f};
+glm::mat4 g_ViewProjection;
+
+glm::vec2 g_CameraPos{-100.f, 0.f};
 glm::mat4 g_CameraView{1.f};
 
 std::vector<Sprite> Sprites;
@@ -23,19 +23,15 @@ std::vector<Sprite> Sprites;
 ShaderProgram* g_ShaderProgramPtr;
 
 void UpdateProjection() {
-	const glm::mat4 View = glm::translate(glm::mat4(1.0f), -glm::vec3(g_CameraPos, 0.f));
+	g_CameraView = glm::translate(glm::mat4(1.0f), -glm::vec3(g_CameraPos, 0.f));
 
-	g_Projection = View * glm::ortho(
-		0.0f, static_cast<float>(WindowWith),   // left, right
-		static_cast<float>(WindowHeight), 0.0f, // bottom, top (flipped Y to match top-left origin)
-		-1.0f, 1.0f                             // near, far
-	);
+	g_Projection = glm::ortho(
+		0.0f, static_cast<float>(WindowWidth),   // left, right
+		static_cast<float>(WindowHeight), 0.0f,	// bottom, top (flipped Y to match top-left origin)
+		-1.0f, 1.0f									// near, far
+	) * g_CameraView;
 
-	// g_Projection = glm::ortho(
-	// 	-(float)WindowWith / 2.0f,  (float)WindowWith / 2.0f,
-	// 	-(float)WindowHeight / 2.0f, (float)WindowHeight / 2.0f,
-	// 	-1.0f, 1.0f
-	// );
+	g_ViewProjection = g_Projection * g_CameraView;
 }
 
 void ProcessInput(GLFWwindow* Window) {
@@ -59,8 +55,8 @@ void Render(GLFWwindow* Window) {
 
 void WindowResizedCallback(GLFWwindow* Window, int NewWidth, int NewHeight)
 {
-	OldWidth = NewWidth;
-	OldHeight = NewHeight;
+	WindowWidth = NewWidth;
+	WindowHeight = NewHeight;
 
 	glViewport(0, 0, NewWidth, NewHeight);
 
@@ -78,7 +74,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* Window = glfwCreateWindow(WindowWith, WindowHeight, "OpenGLBitch", nullptr, nullptr);
+	GLFWwindow* Window = glfwCreateWindow(WindowWidth, WindowHeight, "OpenGLBitch", nullptr, nullptr);
 	if (Window == nullptr)
 	{
 		std::printf("Failed to create GLFW window.\n");
@@ -94,7 +90,7 @@ int main() {
 	}
 
 	glfwSetWindowSizeCallback(Window, WindowResizedCallback);
-	glfwGetFramebufferSize(Window, &OldWidth, &OldHeight);
+	glfwGetFramebufferSize(Window, &WindowWidth, &WindowHeight);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);

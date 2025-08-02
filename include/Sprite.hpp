@@ -35,7 +35,7 @@ class Sprite {
 
 
 	private:
-		glm::vec2 SpriteTexSize;
+		glm::vec2 SpriteTexSize{0.f};
 
 		ShaderProgram* Renderer;
 };

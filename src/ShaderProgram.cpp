@@ -185,9 +185,8 @@ void ShaderProgram::Render()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
-	glUniform1i(Uniform_Texture0, 0);
+	glUniform1i(Uniform_Texture0, 0); // 0 corresponds to GL_TEXTURE0
 
-	// TODO: Set the uniforms from some template function.
 	glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
 	glUniformMatrix4fv(Uniform_Projection, 1, GL_FALSE, glm::value_ptr(*Projection));
 
