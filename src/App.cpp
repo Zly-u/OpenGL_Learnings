@@ -45,8 +45,11 @@ std::expected<bool, std::string_view> App::Init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	Window =
-		glfwCreateWindow(WindowSize.x, WindowSize.y, "OpenGLBitch", nullptr, nullptr);
+	Window = glfwCreateWindow(
+		WindowSize.x, WindowSize.y,
+		"OpenGL Learnings",
+		nullptr, nullptr
+	);
 	if (Window == nullptr)
 	{
 		glfwTerminate();
@@ -105,7 +108,7 @@ void App::WindowResizedCallback(const int NewWidth, const int NewHeight)
 
 	glViewport(0, 0, NewWidth, NewHeight);
 
-	TheRenderer.UpdateProjection(WindowSize);
+	TheRenderer.UpdateProjection(BaseWindowSize);
 
 	// Update Render on resize.
 	TheRenderer.Render(Window, Sprites);
@@ -142,7 +145,7 @@ void App::GameLoop()
 
 		Update(DeltaTime);
 
-		TheRenderer.UpdateProjection(WindowSize);
+		TheRenderer.UpdateProjection(BaseWindowSize);
 		TheRenderer.Render(Window, Sprites);
 
 		if (GLenum GlError = glGetError(); GlError != GL_NO_ERROR)

@@ -35,6 +35,10 @@ class App {
 		__forceinline void UpdateDeltaTime();
 
 	private:
+		// For setting up the base resolution for the monitor.
+		glm::vec2 BaseWindowSize{1280.f, 720.f};
+
+		// For the Viewport.
 		glm::vec2 WindowSize{1280.f, 720.f};
 
 		// NOTE: Temporarily here cuz we have no Scenes or Levels to store them.
