@@ -165,19 +165,21 @@ void ShaderProgram::PreparePolygon() {
 	glBindVertexArray(0);
 }
 
+
 void ShaderProgram::FindUniforms() {
-	// TODO: Generalized Uniforms access.
-	Uniform_Texture0 = glGetUniformLocation(ShaderProgramID, "Texture0");
+	Uniform_Texture_0 = glGetUniformLocation(ShaderProgramID, "Texture0");
 	Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
 	Uniform_Projection = glGetUniformLocation(ShaderProgramID, "PassedProjection");
 }
+
 
 void ShaderProgram::Use()
 {
 	glUseProgram(ShaderProgramID);
 }
 
-void ShaderProgram::Render()
+
+void ShaderProgram::Render(const glm::mat4& Projection)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -185,10 +187,10 @@ void ShaderProgram::Render()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
-	glUniform1i(Uniform_Texture0, 0); // 0 corresponds to GL_TEXTURE0
+	glUniform1i(Uniform_Texture_0, 0); // 0 corresponds to GL_TEXTURE0
 
 	glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
-	glUniformMatrix4fv(Uniform_Projection, 1, GL_FALSE, glm::value_ptr(*Projection));
+	glUniformMatrix4fv(Uniform_Projection, 1, GL_FALSE, glm::value_ptr(Projection));
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -200,7 +202,7 @@ void ShaderProgram::Render()
 }
 
 
-void ShaderProgram::SetTranform(const glm::mat4& NewTransform)
+void ShaderProgram::SetTransform(const glm::mat4& NewTransform)
 {
 	Transform = NewTransform;
 }

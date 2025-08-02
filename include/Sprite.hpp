@@ -18,14 +18,16 @@ struct TextureData
 class Sprite {
 	public:
 		Sprite();
+		explicit Sprite(const std::string_view& ImagePath);
 		Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath);
-		Sprite(const std::string_view& ImagePath, glm::mat4* Projection);
 		Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader);
 		Sprite(ShaderProgram& OtherShaderProgram);
 
 		void Init();
 		void LoadImage(const std::string_view& ImagePath);
-		void Render();
+
+		void Update(const float DeltaTime);
+		void Render(const glm::mat4& Projection);
 
 
 	public:
@@ -39,5 +41,5 @@ class Sprite {
 		float ZDepth = 0.f;
 
 	private:
-		ShaderProgram* Renderer;
+		ShaderProgram* SpriteRenderer;
 };

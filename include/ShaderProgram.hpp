@@ -15,10 +15,10 @@ class ShaderProgram
 		int64_t LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType);
 		void    PreparePolygon();
 		void    Use();
-		void    Render();
+		void    Render(const glm::mat4& Projection);
 
 	public:
-		void SetTranform(const glm::mat4& NewTransform);
+		void SetTransform(const glm::mat4& NewTransform);
 
 	public:
 		uint32_t VBO = 0;
@@ -29,12 +29,11 @@ class ShaderProgram
 
 		uint32_t ShaderProgramID = 0;
 
-		int32_t Uniform_Texture0;
+		int32_t Uniform_Texture_0;
 		int32_t Uniform_Transform;
 		int32_t Uniform_Projection;
 
 
 	public:
-		glm::mat4* Projection;
 		glm::mat4 Transform{1.f};
 };

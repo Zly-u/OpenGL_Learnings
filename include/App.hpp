@@ -1,0 +1,50 @@
+#pragma once
+#include "Renderer.hpp"
+
+
+#include <GLFW/glfw3.h>
+#include <expected>
+#include <glm/vec2.hpp>
+#include <string_view>
+
+class App {
+	protected:
+		App();
+
+	public:
+		~App();
+		App(const App&)       = delete;
+		App(const App&&)      = delete;
+		App& operator=(App&&) = delete;
+
+		static App& Get();
+
+
+	public:
+		std::expected<bool, std::string_view> Init();
+		void PostInit();
+
+		void WindowResizedCallback(int NewWidth, int NewHeight);
+		const glm::vec2& GetWindowSize() const;
+
+		void ProcessInput();
+		void Update(const float DeltaTime);
+		void GameLoop();
+
+	private:
+		__forceinline void UpdateDeltaTime();
+
+	private:
+		glm::vec2 WindowSize{1280.f, 720.f};
+
+		// NOTE: Temporarily here cuz we have no Scenes or Levels to store them.
+		std::vector<Sprite> Sprites;
+
+
+	private:
+		GLFWwindow* Window = nullptr;
+		Renderer TheRenderer;
+
+		float DeltaTime = 0.f;
+		float PreviousFrameTime = 0.f;
+};

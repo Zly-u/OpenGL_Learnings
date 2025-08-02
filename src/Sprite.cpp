@@ -9,34 +9,40 @@
 #include "Random.h"
 
 
-Sprite::Sprite(): Renderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")) {
+Sprite::Sprite(): SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")) {
 }
 
-Sprite::Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader): Renderer(new ShaderProgram(VertexShader, FragmentShader)) {
-}
 
-Sprite::Sprite(ShaderProgram& OtherShaderProgram): Renderer(&OtherShaderProgram) {
-}
-
-Sprite::Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath): Renderer(&OtherShaderProgram) {
+Sprite::Sprite(const std::string_view& ImagePath) : SpriteRenderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")){
 	LoadImage(ImagePath);
 }
 
-Sprite::Sprite(const std::string_view& ImagePath, glm::mat4* Projection) : Renderer(new ShaderProgram("shaders/vertex.glsl", "shaders/fragment.glsl")){
-	Renderer->Projection = Projection;
+
+Sprite::Sprite(const std::string_view& VertexShader, const std::string_view& FragmentShader): SpriteRenderer(new ShaderProgram(VertexShader, FragmentShader)) {
+}
+
+
+Sprite::Sprite(ShaderProgram& OtherShaderProgram): SpriteRenderer(&OtherShaderProgram) {
+}
+
+
+Sprite::Sprite(ShaderProgram& OtherShaderProgram, const std::string_view& ImagePath): SpriteRenderer(&OtherShaderProgram) {
 	LoadImage(ImagePath);
 }
+
 
 void Sprite::Init() {
 
 }
 
 
-void Sprite::LoadImage(const std::string_view& ImagePath) {
+void Sprite::LoadImage(const std::string_view& ImagePath)
+{
 	stbi_set_flip_vertically_on_load(true);
 
-	int ImageWidth, ImageHeight, ColorChannels;
-	unsigned char * ImageData = stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
+	int            ImageWidth, ImageHeight, ColorChannels;
+	unsigned char* ImageData =
+		stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
 	if (!ImageData)
 	{
 		Log::println("[ERROR]: Failed to load an image: {}", ImagePath);
@@ -45,21 +51,26 @@ void Sprite::LoadImage(const std::string_view& ImagePath) {
 
 	// Determine format based on channels
 	GLenum ColorFormat = GL_RGB;
-	if (ColorChannels == 1) {
+	if (ColorChannels == 1)
+	{
 		ColorFormat = GL_RED;
 	}
-	else if (ColorChannels == 3) {
+	else if (ColorChannels == 3)
+	{
 		ColorFormat = GL_RGB;
 	}
-	else if (ColorChannels == 4) {
+	else if (ColorChannels == 4)
+	{
 		ColorFormat = GL_RGBA;
 	}
 
 	int rowAlignment = 1;
-	if ((ImageWidth * ColorChannels) % 4 == 0) {
+	if ((ImageWidth * ColorChannels) % 4 == 0)
+	{
 		rowAlignment = 4;
 	}
-	else if ((ImageWidth * ColorChannels) % 2 == 0) {
+	else if ((ImageWidth * ColorChannels) % 2 == 0)
+	{
 		rowAlignment = 2;
 	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, rowAlignment);
@@ -76,10 +87,14 @@ void Sprite::LoadImage(const std::string_view& ImagePath) {
 
 	glTexImage2D(
 		GL_TEXTURE_2D,
-		0, GL_RGB,
-		ImageWidth, ImageHeight,
-		0, // Legacy arg.
-		ColorFormat, GL_UNSIGNED_BYTE, ImageData
+		0,
+		GL_RGB,
+		ImageWidth,
+		ImageHeight,
+		0,    // Legacy arg.
+		ColorFormat,
+		GL_UNSIGNED_BYTE,
+		ImageData
 	);
 
 	// Reset to default
@@ -87,18 +102,24 @@ void Sprite::LoadImage(const std::string_view& ImagePath) {
 
 	stbi_image_free(ImageData);
 
-	Renderer->TextureID = NewTextureID;
-	SpriteTexSize = glm::vec2(ImageWidth, ImageHeight);
+	SpriteRenderer->TextureID = NewTextureID;
+	SpriteTexSize             = glm::vec2(ImageWidth, ImageHeight);
 }
 
-void Sprite::Render() {
+
+void Sprite::Update(const float DeltaTime)
+{
+
+}
+
+
+void Sprite::Render(const glm::mat4& Projection) {
 	glm::mat4 Transform{1.0f};
 
 	Transform = glm::translate(Transform, glm::vec3(Location.x, Location.y, ZDepth));
 	Transform = glm::rotate(Transform, glm::radians(Rotation), glm::vec3(0.0, 0.0, 1.0));
 	Transform = glm::scale(Transform, glm::vec3(Scale + SpriteTexSize, 0.f));
 
-	Renderer->SetTranform(Transform);
-
-	Renderer->Render();
+	SpriteRenderer->SetTransform(Transform);
+	SpriteRenderer->Render(Projection);
 }
