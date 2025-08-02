@@ -32,6 +32,8 @@ void Sprite::Init() {
 
 
 void Sprite::LoadImage(const std::string_view& ImagePath) {
+	stbi_set_flip_vertically_on_load(true);
+	
 	int ImageWidth, ImageHeight, ColorChannels;
 	unsigned char * ImageData = stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
 	if (!ImageData)
