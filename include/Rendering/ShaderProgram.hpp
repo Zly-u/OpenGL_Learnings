@@ -191,15 +191,9 @@ class ShaderProgram
 		uint32_t VBO = 0;
 		uint32_t EBO = 0;
 
-		uint32_t TextureID = 0;
-
 		uint32_t ShaderProgramID = 0;
 
 		ShaderUniformsDescriptor<TUniformsListType> UniformsDescriptor;
-
-		// int32_t Uniform_Texture_0;
-		// int32_t Uniform_Transform;
-		// int32_t Uniform_Projection;
 
 
 	public:

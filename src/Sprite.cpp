@@ -34,15 +34,14 @@ static const std::array<Sprite::SpriteVertexData, 4> SpriteVertices = {
 };
 // clang-format on
 
-Sprite::Sprite(const std::string_view& ImagePath)
-	: SpriteRenderer(new SpriteSP("shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices))
+Sprite::Sprite(const std::string_view& ImagePath) : SpriteRenderer(new SpriteSPType("shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices))
 {
 	LoadImage(ImagePath);
 	SpriteRenderer->UniformsDescriptor.SetGraphicsUpdatingFunction(
 		[&]
 		{
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, SpriteRenderer->TextureID);
+			glBindTexture(GL_TEXTURE_2D, TextureID);
 
 			SpriteRenderer->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
 
@@ -124,8 +123,8 @@ void Sprite::LoadImage(const std::string_view& ImagePath)
 
 	stbi_image_free(ImageData);
 
-	SpriteRenderer->TextureID = NewTextureID;
-	SpriteTexSize             = glm::vec2(ImageWidth, ImageHeight);
+	TextureID = NewTextureID;
+	SpriteTexSize = glm::vec2(ImageWidth, ImageHeight);
 }
 
 

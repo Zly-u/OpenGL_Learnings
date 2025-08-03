@@ -11,7 +11,7 @@ class Renderer
 	using UVAttribute       = GLMVertexAttribute<1, glm::vec2>;
 
 	// TODO: Uniforms syntax like this
-	using Texture0Uniform = GLMShaderUniform<"ScreenTexture", GLuint>;
+	using TextureScreenUniform = GLMShaderUniform<"ScreenTexture", GLuint>;
 
 	public:
 		struct ScreenVertexData
@@ -23,7 +23,7 @@ class Renderer
 		using ScreenSP = ShaderProgram<
 			ScreenVertexData,
 			VertexAttributesList<PositionAttribute, UVAttribute>,
-			ShaderUniformsList<Texture0Uniform>
+			ShaderUniformsList<TextureScreenUniform>
 		>;
 
 
