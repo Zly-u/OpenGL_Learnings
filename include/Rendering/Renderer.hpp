@@ -10,7 +10,6 @@ class Renderer
 	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
 	using UVAttribute       = GLMVertexAttribute<1, glm::vec2>;
 
-	// TODO: Uniforms syntax like this
 	using TextureScreenUniform = GLMShaderUniform<"ScreenTexture", GLuint>;
 
 	public:

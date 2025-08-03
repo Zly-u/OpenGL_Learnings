@@ -37,23 +37,10 @@ static const std::array<Sprite::SpriteVertexData, 4> SpriteVertices = {
 Sprite::Sprite(const std::string_view& ImagePath) : SpriteRenderer(new SpriteSPType("shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices))
 {
 	LoadImage(ImagePath);
-	SpriteRenderer->UniformsDescriptor.SetGraphicsUpdatingFunction(
-		[&]
-		{
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, TextureID);
-
-			SpriteRenderer->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
-
-			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(SpriteRenderer->Transform);
-			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(SpriteRenderer->Projection);
-		}
-	);
 }
 
 
 void Sprite::Init() {
-
 }
 
 
@@ -144,5 +131,19 @@ void Sprite::Render(const glm::mat4& Projection) {
 	SpriteRenderer->SetTransform(Transform);
 	SpriteRenderer->SetProjection(Projection);
 
-	SpriteRenderer->Render();
+	SpriteRenderer->Render(
+		[&]{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, TextureID);
+
+			SpriteRenderer->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
+
+			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(SpriteRenderer->Transform);
+			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(SpriteRenderer->Projection);
+		},
+		[&]
+		{
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+	);
 }

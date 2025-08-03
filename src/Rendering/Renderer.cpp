@@ -90,17 +90,6 @@ Renderer::Renderer()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// -----------------------------------------------------------------------------------
-	ScreenRenderer.UniformsDescriptor.SetGraphicsUpdatingFunction(
-		[&]
-		{
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
-			glUniform1i(glGetUniformLocation(ScreenRenderer.ShaderProgramID, "ScreenTexture"), 0);
-
-			// ScreenRenderer.UniformsDescriptor.SetUniform<TextureScreenUniform>(0); // 0 corresponds to GL_TEXTURE0
-		}
-	);
-	// -----------------------------------------------------------------------------------
 }
 
 
@@ -152,7 +141,18 @@ void Renderer::Render(GLFWwindow* Window, std::vector<Sprite>& Sprites)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		ScreenRenderer.Render();
+		ScreenRenderer.Render(
+			[&]
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
+				ScreenRenderer.UniformsDescriptor.SetUniform<TextureScreenUniform>(0); // 0 corresponds to GL_TEXTURE0
+			},
+			[&]
+			{
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+		);
 	}
 
 	glfwSwapBuffers(Window);

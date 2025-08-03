@@ -6,11 +6,8 @@
 #include "TVertexArrayObject.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include "GlmTypeTraits_Uniform.hpp"
 #include "ShaderUniformsDescriptor.hpp"
 
-
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 
 #include <fstream>
@@ -25,6 +22,8 @@
 template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
 class ShaderProgram
 {
+	using GraphicsUpdatingFuncSign = std::function<void()>;
+
 	public:
 		ShaderProgram(
 			const std::string_view& VertexShader,
@@ -51,7 +50,7 @@ class ShaderProgram
 			glUseProgram(ShaderProgramID);
 		}
 
-		void Render()
+		void Render(const GraphicsUpdatingFuncSign& GraphicsUpdateFunc, const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc)
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -59,24 +58,26 @@ class ShaderProgram
 
 			VAO.Bind();
 
-			UniformsDescriptor.UpdateGraphics();
+			GraphicsUpdateFunc();
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 			// Unbind stuff
 			glBindVertexArray(0);
-			glBindTexture(GL_TEXTURE_2D, 0);
+
+			DeinitializeGraphicsFunc();
+
 			glUseProgram(0);
 		}
 
 
 	public:
-		void SetTransform(const glm::mat4& NewTransform)
+		__forceinline void SetTransform(const glm::mat4& NewTransform)
 		{
 			Transform = NewTransform;
 		}
 
-		void SetProjection(const glm::mat4& NewProjection)
+		__forceinline void SetProjection(const glm::mat4& NewProjection)
 		{
 			Projection = NewProjection;
 		}

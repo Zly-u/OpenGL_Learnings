@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonTemplates.hpp"
+#include "GlmTypeTraits_Uniform.hpp"
 
 #include <functional>
 
@@ -33,7 +34,7 @@ struct GLMShaderUniform
 		GLMUniformTypeTrait<ValueType>::Set(Location, Value);
 	}
 
-	constexpr const char* GetName() const
+	[[nodiscard]] constexpr const char* GetName() const
 	{
 		return Name.String;
 	}
@@ -43,13 +44,10 @@ struct GLMShaderUniform
 template<typename TUniformsListType>
 class ShaderUniformsDescriptor
 {
-	using UniformUpdatingFuncSign = std::function<void()>;
 	using UniformTupleType = typename TUniformsListType::TupleType;
 
 	UniformTupleType Uniforms;
 	GLuint ShaderProgramID = 0;
-
-	UniformUpdatingFuncSign GraphicalSetupFunction;
 
 
 	public:
@@ -67,28 +65,16 @@ class ShaderUniformsDescriptor
 			Uniform.Set(Value);
 		}
 
-		void SetGraphicsUpdatingFunction(const UniformUpdatingFuncSign NewUniformUpdatingFunction)
-		{
-			GraphicalSetupFunction = NewUniformUpdatingFunction;
-		}
-
-		void UpdateGraphics()
-		{
-			GraphicalSetupFunction();
-		}
-
 
 	private:
-		template<std::size_t Index = 0>
 		void FindUniforms()
 		{
-			if constexpr (Index < std::tuple_size_v<UniformTupleType>)
-			{
-				auto& Uniform = std::get<Index>(Uniforms);
-				const char* Name = Uniform.GetName();
-				Log::println("Uniform: {}", Name);
-				Uniform.Location = glGetUniformLocation(ShaderProgramID, Name);
-				FindUniforms<Index + 1>();
-			}
+			std::apply(
+				[this](auto&... Uniforms)
+				{
+					((Uniforms.Location = glGetUniformLocation(ShaderProgramID, Uniforms.GetName())), ...);
+				},
+				Uniforms
+			);
 		}
 };
