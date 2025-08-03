@@ -8,7 +8,7 @@
 
 // clang-format off
 // Different positions and UVs are flipped due to how Framebuffer stores data.
-constexpr std::array<Renderer::ScreenVertexData, 4> ScreenVertices = {
+static const std::array<Renderer::ScreenVertexData, 4> ScreenVertices = {
 	Renderer::ScreenVertexData
 	{
 		.Position = { -1.f, 1.f },
@@ -89,6 +89,17 @@ Renderer::Renderer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	// -----------------------------------------------------------------------------------
+	ScreenRenderer.UniformsDescriptor.SetGraphicsUpdatingFunction(
+		[&]
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, ScreenRenderer.TextureID);
+
+			//glUniform1i(Uniform_Texture_0, 0);
+			ScreenRenderer.UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
+		}
+	);
 	// -----------------------------------------------------------------------------------
 }
 

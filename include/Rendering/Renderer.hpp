@@ -10,6 +10,9 @@ class Renderer
 	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
 	using UVAttribute       = GLMVertexAttribute<1, glm::vec2>;
 
+	// TODO: Uniforms syntax like this
+	using Texture0Uniform = GLMShaderUniform<"ScreenTexture", GLuint>;
+
 	public:
 		struct ScreenVertexData
 		{
@@ -17,7 +20,11 @@ class Renderer
 			glm::vec2 UV;
 		};
 
-		using ScreenSP = ShaderProgram<ScreenVertexData, PositionAttribute, UVAttribute>;
+		using ScreenSP = ShaderProgram<
+			ScreenVertexData,
+			VertexAttributesList<PositionAttribute, UVAttribute>,
+			ShaderUniformsList<Texture0Uniform>
+		>;
 
 
 	public:

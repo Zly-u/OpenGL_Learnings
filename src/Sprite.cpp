@@ -9,7 +9,7 @@
 #include "Random.h"
 
 // clang-format off
-constexpr std::array<Sprite::SpriteVertexData, 4> SpriteVertices = {
+static const std::array<Sprite::SpriteVertexData, 4> SpriteVertices = {
 	Sprite::SpriteVertexData
 	{
 		.Position = { -.5f, .5f },
@@ -38,6 +38,18 @@ Sprite::Sprite(const std::string_view& ImagePath)
 	: SpriteRenderer(new SpriteSP("shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices))
 {
 	LoadImage(ImagePath);
+	SpriteRenderer->UniformsDescriptor.SetGraphicsUpdatingFunction(
+		[&]
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, SpriteRenderer->TextureID);
+
+			SpriteRenderer->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
+
+			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(SpriteRenderer->Transform);
+			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(SpriteRenderer->Projection);
+		}
+	);
 }
 
 
@@ -131,5 +143,7 @@ void Sprite::Render(const glm::mat4& Projection) {
 	Transform = glm::scale(Transform, glm::vec3(Scale + SpriteTexSize, 0.f));
 
 	SpriteRenderer->SetTransform(Transform);
-	SpriteRenderer->Render(Projection);
+	SpriteRenderer->SetProjection(Projection);
+
+	SpriteRenderer->Render();
 }

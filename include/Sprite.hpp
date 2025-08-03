@@ -11,6 +11,10 @@ class Sprite
 	using ColorAttribute    = GLMVertexAttribute<1, glm::vec3>;
 	using UVAttribute       = GLMVertexAttribute<2, glm::vec2>;
 
+	using Texture0Uniform = GLMShaderUniform<"Texture0", GLuint>;
+	using TransformUniform = GLMShaderUniform<"PassedTransform", glm::mat4>;
+	using ProjectionUniform = GLMShaderUniform<"PassedProjection", glm::mat4>;
+
 	public:
 		struct SpriteVertexData
 		{
@@ -19,7 +23,11 @@ class Sprite
 			glm::vec2 UV;
 		};
 
-		using SpriteSP = ShaderProgram<SpriteVertexData, PositionAttribute, ColorAttribute, UVAttribute>;
+		using SpriteSP = ShaderProgram<
+			SpriteVertexData,
+			VertexAttributesList<PositionAttribute, ColorAttribute, UVAttribute>,
+			ShaderUniformsList<Texture0Uniform, TransformUniform, ProjectionUniform>
+		>;
 
 	public:
 		explicit Sprite(const std::string_view& ImagePath);

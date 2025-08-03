@@ -6,6 +6,10 @@
 #include "TVertexArrayObject.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include "GlmTypeTraits_Uniform.hpp"
+#include "ShaderUniformsDescriptor.hpp"
+
+
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
 
@@ -14,35 +18,23 @@
 
 #include <array>
 #include <glad/glad.h>
-#include <glm/ext/matrix_float4x4.hpp>
 #include <string_view>
-
-// template<typename UniformType, const char* UniformName>
-// struct Uniform
-// {
-// 	using Type = UniformType;
-//
-// 	static constexpr const std::string_view Name = UniformName;
-// 	GLint Location = -1;
-// };
-
 
 // ---------------------------------------------------------------------------------------
 
-// TODO: Templated way of making Inputs and Outputs?
-template<typename VertexDataType, typename... TGlAttributes>
+template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
 class ShaderProgram
 {
 	public:
 		ShaderProgram(
-			const std::string_view&              VertexShader,
-			const std::string_view&              FragmentShader,
+			const std::string_view& VertexShader,
+			const std::string_view& FragmentShader,
+
 			const std::array<VertexDataType, 4>& NewVertices
 		) :
 			Vertices(NewVertices)
 		{
 			PrepareShaders(VertexShader, FragmentShader);
-			FindUniforms();
 			PreparePolygon();
 		}
 
@@ -59,7 +51,7 @@ class ShaderProgram
 			glUseProgram(ShaderProgramID);
 		}
 
-		void Render(const glm::mat4& Projection)
+		void Render()
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -67,18 +59,7 @@ class ShaderProgram
 
 			VAO.Bind();
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, TextureID);
-
-			glUniform1i(Uniform_Texture_0, 0);    // 0 corresponds to GL_TEXTURE0
-
-			glUniformMatrix4fv(Uniform_Transform, 1, GL_FALSE, glm::value_ptr(Transform));
-			glUniformMatrix4fv(
-				Uniform_Projection,
-				1,
-				GL_FALSE,
-				glm::value_ptr(Projection)
-			);
+			UniformsDescriptor.UpdateGraphics();
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -95,20 +76,25 @@ class ShaderProgram
 			Transform = NewTransform;
 		}
 
-	private:
-		int64_t
-		LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType)
+		void SetProjection(const glm::mat4& NewProjection)
 		{
-			std::ifstream infile(ShaderFile.data());
+			Projection = NewProjection;
+		}
 
-			if (infile.fail())
+
+	private:
+		int64_t LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) const
+		{
+			std::ifstream File(ShaderFile.data());
+
+			if (File.fail())
 			{
 				Log::println("Error opening shader file: {}", ShaderFile);
 				return -1;
 			}
 
 			std::stringstream Buffer_ShaderShader;
-			Buffer_ShaderShader << infile.rdbuf();
+			Buffer_ShaderShader << File.rdbuf();
 			std::string ShaderContent = Buffer_ShaderShader.str();
 
 			const char* VertexShaderData      = ShaderContent.c_str();
@@ -137,20 +123,15 @@ class ShaderProgram
 			return NewShaderID;
 		}
 
-		void PrepareShaders(
-			const std::string_view& VertexShader,
-			const std::string_view& FragmentShader
-		)
+		void PrepareShaders(const std::string_view& VertexShader, const std::string_view& FragmentShader)
 		{
-			const int64_t VertexShaderID =
-				LoadShaderFromFile(VertexShader, GL_VERTEX_SHADER);
+			const int64_t VertexShaderID = LoadShaderFromFile(VertexShader, GL_VERTEX_SHADER);
 			if (VertexShaderID == -1)
 			{
 				return;
 			}
 
-			const int64_t FragmentShaderID =
-				LoadShaderFromFile(FragmentShader, GL_FRAGMENT_SHADER);
+			const int64_t FragmentShaderID = LoadShaderFromFile(FragmentShader, GL_FRAGMENT_SHADER);
 			if (FragmentShaderID == -1)
 			{
 				return;
@@ -175,14 +156,8 @@ class ShaderProgram
 
 			glDeleteShader(VertexShaderID);
 			glDeleteShader(FragmentShaderID);
-		}
 
-		void FindUniforms()
-		{
-			Uniform_Texture_0 = glGetUniformLocation(ShaderProgramID, "Texture0");
-			Uniform_Transform = glGetUniformLocation(ShaderProgramID, "PassedTransform");
-			Uniform_Projection =
-				glGetUniformLocation(ShaderProgramID, "PassedProjection");
+			UniformsDescriptor.SetShaderProgramID(ShaderProgramID);
 		}
 
 		void PreparePolygon()
@@ -199,21 +174,11 @@ class ShaderProgram
 
 			// Vertex buffer
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(
-				GL_ARRAY_BUFFER,
-				sizeof(Vertices),
-				Vertices.data(),
-				GL_STATIC_DRAW
-			);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices.data(), GL_STATIC_DRAW);
 
 			// Element buffer
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			glBufferData(
-				GL_ELEMENT_ARRAY_BUFFER,
-				sizeof(Indices),
-				Indices,
-				GL_STATIC_DRAW
-			);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
 			VAO.SetupVertexAttributes();
 
@@ -221,7 +186,7 @@ class ShaderProgram
 		}
 
 	public:
-		VertexArrayObject<VertexDataType, TGlAttributes...> VAO;
+		VertexArrayObject<VertexDataType, TAttributeListType> VAO;
 
 		uint32_t VBO = 0;
 		uint32_t EBO = 0;
@@ -230,15 +195,18 @@ class ShaderProgram
 
 		uint32_t ShaderProgramID = 0;
 
-		int32_t Uniform_Texture_0;
-		int32_t Uniform_Transform;
-		int32_t Uniform_Projection;
+		ShaderUniformsDescriptor<TUniformsListType> UniformsDescriptor;
+
+		// int32_t Uniform_Texture_0;
+		// int32_t Uniform_Transform;
+		// int32_t Uniform_Projection;
 
 
 	public:
 		glm::mat4 Transform{ 1.f };
+		glm::mat4 Projection{ 1.f };
 
 
 	private:
-		std::array<VertexDataType, 4> Vertices;
+		const std::array<VertexDataType, 4>& Vertices;
 };

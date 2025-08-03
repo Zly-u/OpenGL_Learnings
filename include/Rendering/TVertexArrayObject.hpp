@@ -3,6 +3,25 @@
 #include "GlmTypeTraits.hpp"
 #include <tuple>
 
+template<typename... TAttributes>
+struct VertexAttributesList
+{
+	using Type = std::tuple<TAttributes...>;
+	static constexpr size_t Count = sizeof...(TAttributes);
+};
+
+
+namespace std {
+	template<typename... TAttributes>
+	struct tuple_size<VertexAttributesList<TAttributes...>> : integral_constant<size_t, sizeof...(TAttributes)> {};
+
+	template<size_t I, typename... TAttributes>
+	struct tuple_element<I, VertexAttributesList<TAttributes...>>
+	{
+		using type = tuple_element_t<I, tuple<TAttributes...>>;
+	};
+}
+
 
 /*
  * For generic types.
@@ -34,7 +53,7 @@ struct GLMVertexAttribute
 /*
  * VertexArrayObject Class that auto generates all Attributes for usage in Shaders.
  */
-template<typename VertexDataStruct, typename... TAttributes>
+template<typename VertexDataStruct, typename TAttributeListType>
 struct VertexArrayObject
 {
 	public:
@@ -43,10 +62,22 @@ struct VertexArrayObject
 		// -------------------------------------------------------------------------------
 
 	public:
+		template<typename Tuple>
+		static constexpr std::size_t CalculateAttributesSize()
+		{
+			return CalculateAttributesSizeImpl<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{});
+		}
+
+		template<typename Tuple, std::size_t... Indexes>
+		static constexpr std::size_t CalculateAttributesSizeImpl(std::index_sequence<Indexes...>)
+		{
+			return (sizeof(typename std::tuple_element_t<Indexes, Tuple>::GlmType) + ...);
+		}
+
 		explicit VertexArrayObject()
 		{
 			static_assert(
-				sizeof(VertexDataStruct) == (sizeof(typename TAttributes::GlmType) + ...),
+				sizeof(VertexDataStruct) == CalculateAttributesSize<typename TAttributeListType::Type>(),
 				"VertexDataStruct size must match sum of attribute sizes"
 			);
 			glGenVertexArrays(1, &ID);
@@ -106,9 +137,9 @@ struct VertexArrayObject
 
 		template<std::size_t I = 0>
 		void SetupVertexAttributesImpl(const GLsizei Stride, const size_t CurrentOffset = 0) {
-			if constexpr (I < sizeof...(TAttributes))
+			if constexpr (I < std::tuple_size_v<TAttributeListType>)
 			{
-				using CurrentAttribute = std::tuple_element_t<I, std::tuple<TAttributes...>>;
+				using CurrentAttribute = std::tuple_element_t<I, TAttributeListType>;
 
 				glVertexAttribPointer(
 					CurrentAttribute::Location,
@@ -150,5 +181,4 @@ struct VertexArrayObject
 
 	private:
 		GLuint ID;
-		std::tuple<TAttributes...> Attributes;
 };
