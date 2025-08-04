@@ -161,14 +161,14 @@ void Renderer::Render(GLFWwindow* Window, std::vector<Sprite>& Sprites)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		ScreenRenderer.Render(
-			[&]
+		ScreenRenderer.Render<ScreenSP>(
+			[&](ScreenSP* ShaderProgram)
 			{
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
-				ScreenRenderer.UniformsDescriptor.SetUniform<TextureScreenUniform>(0); // 0 corresponds to GL_TEXTURE0
+				ShaderProgram->UniformsDescriptor.SetUniform<TextureScreenUniform>(0); // 0 corresponds to GL_TEXTURE0
 			},
-			[&]
+			[&](ScreenSP* ShaderProgram)
 			{
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}

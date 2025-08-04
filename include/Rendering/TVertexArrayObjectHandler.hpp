@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GlmTypeTraits_VertexAttribute.hpp"
+#include "TypeTraits_VertexAttribute.hpp"
 #include <tuple>
 
 template<typename... TAttributes>
@@ -42,7 +42,7 @@ struct VertexAttribute
 template<GLuint AttrLocation, typename TGlmType, GLboolean TypeNormalized = GL_FALSE>
 struct GLMVertexAttribute
 {
-	using TypeTrait = GLMTypeTrait<TGlmType>;
+	using TypeTrait = VertexAttributeTypeTrait<TGlmType>;
 	using Type = typename TypeTrait::ComponentType;
 	using Type2 = TGlmType;
 

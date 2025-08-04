@@ -81,12 +81,12 @@ void App::PostInit()
 {
 	Sprites.reserve(100);
 
-	Sprite& Sprite_0  = Sprites.emplace_back("Assets/container.jpg");
-	Sprite_0.Name     = "Box";
+	Sprite& Sprite_0  = Sprites.emplace_back("Assets/AmyAAAA.png");
+	Sprite_0.Name     = "Amy1";
 	Sprite_0.Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
 
-	Sprite& Sprite_1  = Sprites.emplace_back("Assets/TextureTest.png");
-	Sprite_1.Name     = "Guy";
+	Sprite& Sprite_1  = Sprites.emplace_back("Assets/AmyM.png");
+	Sprite_1.Name     = "Amy2";
 	Sprite_1.Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
 }
 

@@ -7,10 +7,10 @@
 #include <glm/vec4.hpp>
 
 template<typename T>
-struct GLMTypeTrait { };
+struct VertexAttributeTypeTrait { };
 
 template<>
-struct GLMTypeTrait<glm::vec2> {
+struct VertexAttributeTypeTrait<glm::vec2> {
 	using ComponentType = float;
 
     static constexpr GLint Size = 2;
@@ -18,7 +18,7 @@ struct GLMTypeTrait<glm::vec2> {
 };
 
 template<>
-struct GLMTypeTrait<glm::vec3> {
+struct VertexAttributeTypeTrait<glm::vec3> {
     using ComponentType = float;
 
     static constexpr GLint Size = 3;
@@ -26,7 +26,7 @@ struct GLMTypeTrait<glm::vec3> {
 };
 
 template<>
-struct GLMTypeTrait<glm::vec4> {
+struct VertexAttributeTypeTrait<glm::vec4> {
     using ComponentType = float;
 
     static constexpr GLint Size = 4;
@@ -34,7 +34,7 @@ struct GLMTypeTrait<glm::vec4> {
 };
 
 template<>
-struct GLMTypeTrait<glm::ivec2> {
+struct VertexAttributeTypeTrait<glm::ivec2> {
     using ComponentType = int;
 
     static constexpr GLint Size = 2;
@@ -42,7 +42,7 @@ struct GLMTypeTrait<glm::ivec2> {
 };
 
 template<>
-struct GLMTypeTrait<glm::ivec3> {
+struct VertexAttributeTypeTrait<glm::ivec3> {
     using ComponentType = int;
 
     static constexpr GLint Size = 3;
@@ -50,7 +50,7 @@ struct GLMTypeTrait<glm::ivec3> {
 };
 
 template<>
-struct GLMTypeTrait<glm::ivec4> {
+struct VertexAttributeTypeTrait<glm::ivec4> {
     using ComponentType = int;
 
     static constexpr GLint Size = 4;
@@ -58,7 +58,7 @@ struct GLMTypeTrait<glm::ivec4> {
 };
 
 template<>
-struct GLMTypeTrait<glm::uvec2> {
+struct VertexAttributeTypeTrait<glm::uvec2> {
     using ComponentType = unsigned int;
 
     static constexpr GLint Size = 2;
@@ -66,7 +66,7 @@ struct GLMTypeTrait<glm::uvec2> {
 };
 
 template<>
-struct GLMTypeTrait<glm::uvec3> {
+struct VertexAttributeTypeTrait<glm::uvec3> {
     using ComponentType = unsigned int;
 
     static constexpr GLint Size = 3;
@@ -74,7 +74,7 @@ struct GLMTypeTrait<glm::uvec3> {
 };
 
 template<>
-struct GLMTypeTrait<glm::uvec4> {
+struct VertexAttributeTypeTrait<glm::uvec4> {
     using ComponentType = unsigned int;
 
     static constexpr GLint Size = 4;
@@ -83,7 +83,7 @@ struct GLMTypeTrait<glm::uvec4> {
 
 // Double precision vectors
 template<>
-struct GLMTypeTrait<glm::dvec2> {
+struct VertexAttributeTypeTrait<glm::dvec2> {
     using ComponentType = double;
 
     static constexpr GLint Size = 2;
@@ -91,7 +91,7 @@ struct GLMTypeTrait<glm::dvec2> {
 };
 
 template<>
-struct GLMTypeTrait<glm::dvec3> {
+struct VertexAttributeTypeTrait<glm::dvec3> {
     using ComponentType = double;
 
     static constexpr GLint Size = 3;
@@ -99,7 +99,7 @@ struct GLMTypeTrait<glm::dvec3> {
 };
 
 template<>
-struct GLMTypeTrait<glm::dvec4> {
+struct VertexAttributeTypeTrait<glm::dvec4> {
     using ComponentType = double;
 
     static constexpr GLint Size = 4;

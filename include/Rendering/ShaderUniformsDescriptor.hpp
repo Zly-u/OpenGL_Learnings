@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CommonTemplates.hpp"
-#include "GlmTypeTraits_Uniform.hpp"
+#include "TypeTraits_Uniform.hpp"
 
 #include <functional>
 
@@ -20,7 +20,7 @@ struct GLMShaderUniform
 	using ValueType = GLMType;
 
 	static constexpr auto Name = NameLiteral;
-	static constexpr GLenum EnumType = GLMUniformTypeTrait<ValueType>::Type;
+	static constexpr GLenum EnumType = UniformTypeTrait<ValueType>::Type;
 
 	GLint Location = -1;
 
@@ -31,7 +31,7 @@ struct GLMShaderUniform
 			return;
 		}
 
-		GLMUniformTypeTrait<ValueType>::Set(Location, Value);
+		UniformTypeTrait<ValueType>::Set(Location, Value);
 	}
 
 	[[nodiscard]] constexpr const char* GetName() const

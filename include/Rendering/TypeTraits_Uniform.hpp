@@ -7,12 +7,12 @@
 #include <glm/vec4.hpp>
 
 template<typename T>
-struct GLMUniformTypeTrait
+struct UniformTypeTrait
 {
 };
 
 template<>
-struct GLMUniformTypeTrait<float>
+struct UniformTypeTrait<float>
 {
 		static constexpr GLenum Type = GL_FLOAT;
 
@@ -23,7 +23,7 @@ struct GLMUniformTypeTrait<float>
 };
 
 template<>
-struct GLMUniformTypeTrait<GLuint>
+struct UniformTypeTrait<GLuint>
 {
 		static constexpr GLenum Type = GL_INT;
 
@@ -34,7 +34,7 @@ struct GLMUniformTypeTrait<GLuint>
 };
 
 template<>
-struct GLMUniformTypeTrait<glm::vec2>
+struct UniformTypeTrait<glm::vec2>
 {
 		static constexpr GLenum Type = GL_FLOAT_VEC2;
 
@@ -45,7 +45,7 @@ struct GLMUniformTypeTrait<glm::vec2>
 };
 
 template<>
-struct GLMUniformTypeTrait<glm::vec3>
+struct UniformTypeTrait<glm::vec3>
 {
 		static constexpr GLenum Type = GL_FLOAT_VEC3;
 
@@ -56,7 +56,7 @@ struct GLMUniformTypeTrait<glm::vec3>
 };
 
 template<>
-struct GLMUniformTypeTrait<glm::vec4>
+struct UniformTypeTrait<glm::vec4>
 {
 		static constexpr GLenum Type = GL_FLOAT_VEC4;
 
@@ -67,7 +67,7 @@ struct GLMUniformTypeTrait<glm::vec4>
 };
 
 template<>
-struct GLMUniformTypeTrait<glm::mat4>
+struct UniformTypeTrait<glm::mat4>
 {
 		static constexpr GLenum Type = GL_FLOAT_MAT4;
 
@@ -78,7 +78,7 @@ struct GLMUniformTypeTrait<glm::mat4>
 };
 
 template<>
-struct GLMUniformTypeTrait<glm::mat3>
+struct UniformTypeTrait<glm::mat3>
 {
 		static constexpr GLenum Type = GL_FLOAT_MAT3;
 

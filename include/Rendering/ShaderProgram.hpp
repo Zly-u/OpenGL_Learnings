@@ -22,7 +22,8 @@
 template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
 class ShaderProgram
 {
-	using GraphicsUpdatingFuncSign = std::function<void()>;
+	template<typename ShaderProgramType>
+	using GraphicsUpdatingFuncSign = std::function<void(ShaderProgramType*)>;
 
 	public:
 		ShaderProgram(
@@ -50,7 +51,8 @@ class ShaderProgram
 			glUseProgram(ShaderProgramID);
 		}
 
-		void Render(const GraphicsUpdatingFuncSign& GraphicsUpdateFunc, const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc)
+		template<typename ShaderProgramType>
+		void Render(const GraphicsUpdatingFuncSign<ShaderProgramType>& GraphicsUpdateFunc, const GraphicsUpdatingFuncSign<ShaderProgramType>& DeinitializeGraphicsFunc)
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -58,14 +60,14 @@ class ShaderProgram
 
 			VAO_Handler.Bind();
 
-			GraphicsUpdateFunc();
+			GraphicsUpdateFunc(this);
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 			// Unbind stuff
 			glBindVertexArray(0);
 
-			DeinitializeGraphicsFunc();
+			DeinitializeGraphicsFunc(this);
 
 			glUseProgram(0);
 		}

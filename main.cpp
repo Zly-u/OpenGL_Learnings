@@ -1,8 +1,6 @@
 #include "App.hpp"
 #include "Logging.h"
 
-// TODO: Post-Processing
-// TODO: Better way handling custom shaders and their uniforms.
 
 int main() {
 	App& app = App::Get();

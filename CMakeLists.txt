@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.31)
 
+set(CMAKE_EXPORT_NO_PACKAGE_REGISTRY ON)
+
 include(cmake/GlobalDefines.cmake)
 
 project(

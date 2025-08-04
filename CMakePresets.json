@@ -96,5 +96,20 @@
 				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
 			}
 		}
+	],
+
+	"buildPresets": [
+		{
+			"name": "Release-gcc",
+			"configurePreset": "Release-gcc"
+		},
+		{
+			"name": "Debug-gcc",
+			"configurePreset": "Debug-gcc"
+		},
+		{
+			"name": "RelWithDebInfo-gcc",
+			"configurePreset": "RelWithDebInfo-gcc"
+		}
 	]
 }

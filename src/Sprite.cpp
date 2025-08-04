@@ -131,17 +131,17 @@ void Sprite::Render(const glm::mat4& Projection) {
 	SpriteRenderer->SetTransform(Transform);
 	SpriteRenderer->SetProjection(Projection);
 
-	SpriteRenderer->Render(
-		[&]{
+	SpriteRenderer->Render<SpriteSPType>(
+		[&] (SpriteSPType* ShaderProgram){
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureID);
 
 			SpriteRenderer->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
 
-			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(SpriteRenderer->Transform);
-			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(SpriteRenderer->Projection);
+			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(ShaderProgram->Transform);
+			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(ShaderProgram->Projection);
 		},
-		[&]
+		[&](SpriteSPType* ShaderProgram)
 		{
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
