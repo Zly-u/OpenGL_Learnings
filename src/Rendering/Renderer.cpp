@@ -36,6 +36,26 @@ Renderer::Renderer()
 		ScreenVertices
 	)
 {
+	InitializeBuffers();
+
+	App::Get().OnWindowResized.Bind(
+		[&]
+		{
+			Cleanup();
+			InitializeBuffers();
+		}
+	);
+}
+
+
+Renderer::~Renderer()
+{
+	Cleanup();
+}
+
+
+void Renderer::InitializeBuffers()
+{
 	const glm::vec2& WindowSize = App::Get().GetWindowSize();
 
 	// -----------------------------------------------------------------------------------
@@ -93,7 +113,7 @@ Renderer::Renderer()
 }
 
 
-Renderer::~Renderer()
+void Renderer::Cleanup()
 {
 	glDeleteRenderbuffers(1, &RenderBufferObject_DepthAndStencil);
 	glDeleteFramebuffers(1, &FrameBufferObject);

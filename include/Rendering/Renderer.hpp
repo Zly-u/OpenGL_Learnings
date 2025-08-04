@@ -29,6 +29,8 @@ class Renderer
 	public:
 		Renderer();
 		~Renderer();
+		void Cleanup();
+		void InitializeBuffers();
 
 		void UpdateProjection(const glm::vec2& WindowSize);
 		void Render(GLFWwindow* Window, std::vector<Sprite>& Sprites);

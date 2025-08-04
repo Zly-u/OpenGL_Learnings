@@ -1,12 +1,12 @@
 #pragma once
 
-#include "GlmTypeTraits.hpp"
+#include "GlmTypeTraits_VertexAttribute.hpp"
 #include <tuple>
 
 template<typename... TAttributes>
 struct VertexAttributesList
 {
-	using Type = std::tuple<TAttributes...>;
+	using TupleType = std::tuple<TAttributes...>;
 	static constexpr size_t Count = sizeof...(TAttributes);
 };
 
@@ -42,22 +42,30 @@ struct VertexAttribute
 template<GLuint AttrLocation, typename TGlmType, GLboolean TypeNormalized = GL_FALSE>
 struct GLMVertexAttribute
 {
+	using TypeTrait = GLMTypeTrait<TGlmType>;
+	using Type = typename TypeTrait::ComponentType;
+	using Type2 = TGlmType;
+
 	static constexpr GLint Location = AttrLocation;
-	static constexpr GLint Size = GLMTypeTrait<TGlmType>::Size;
-	static constexpr GLenum Type = GLMTypeTrait<TGlmType>::Type;
+	static constexpr GLint Size = TypeTrait::Size;
+	static constexpr GLint SizeInBytes = Size * sizeof(Type);
+	static constexpr GLenum EnumType = TypeTrait::EnumType;
 	static constexpr GLboolean Normalized = TypeNormalized;
-	using GlmType = TGlmType;
 };
 
 
 /*
  * VertexArrayObject Class that auto generates all Attributes for usage in Shaders.
+ * It also does compile-time checks if the passed structure is compatible with declared attributes.
  */
 template<typename VertexDataStruct, typename TAttributeListType>
-struct VertexArrayObject
+struct VertexArrayObjectHandler
 {
 	public:
+		using AttributesTupleType = typename TAttributeListType::TupleType;
 		using VertexDataType = VertexDataStruct;
+
+		AttributesTupleType Attributes;
 
 		// -------------------------------------------------------------------------------
 
@@ -71,20 +79,20 @@ struct VertexArrayObject
 		template<typename Tuple, std::size_t... Indexes>
 		static constexpr std::size_t CalculateAttributesSizeImpl(std::index_sequence<Indexes...>)
 		{
-			return (sizeof(typename std::tuple_element_t<Indexes, Tuple>::GlmType) + ...);
+			return (sizeof(typename std::tuple_element_t<Indexes, Tuple>::Type2) + ...);
 		}
 
-		explicit VertexArrayObject()
+		explicit VertexArrayObjectHandler()
 		{
 			static_assert(
-				sizeof(VertexDataStruct) == CalculateAttributesSize<typename TAttributeListType::Type>(),
+				sizeof(VertexDataStruct) == CalculateAttributesSize<AttributesTupleType>(),
 				"VertexDataStruct size must match sum of attribute sizes"
 			);
 			glGenVertexArrays(1, &ID);
 		}
 
 
-		explicit VertexArrayObject(const GLuint NewVAO) : ID(NewVAO) {}
+		explicit VertexArrayObjectHandler(const GLuint NewVAO) : ID(NewVAO) {}
 
 
 		void operator=(const GLuint NewVAO)
@@ -93,7 +101,7 @@ struct VertexArrayObject
 		}
 
 
-		~VertexArrayObject()
+		~VertexArrayObjectHandler()
 		{
 			glDeleteVertexArrays(1, &ID);
 		}
@@ -144,7 +152,7 @@ struct VertexArrayObject
 				glVertexAttribPointer(
 					CurrentAttribute::Location,
 					CurrentAttribute::Size,
-					CurrentAttribute::Type,
+					CurrentAttribute::EnumType,
 					CurrentAttribute::Normalized,
 					Stride,
 					reinterpret_cast<void*>(CurrentOffset)
@@ -152,29 +160,8 @@ struct VertexArrayObject
 				glEnableVertexAttribArray(CurrentAttribute::Location);
 
 				// Calculate size of current attribute for next offset
-				const size_t AttributeSize = GetAttributeSize<CurrentAttribute>();
-				SetupVertexAttributesImpl<I + 1>(Stride, CurrentOffset + AttributeSize);
+				SetupVertexAttributesImpl<I + 1>(Stride, CurrentOffset + CurrentAttribute::SizeInBytes);
 			}
-		}
-
-		template<typename Attribute>
-		constexpr size_t GetAttributeSize() const {
-			size_t TypeSize = 0;
-
-			// clang-format: off
-			switch (Attribute::Type) {
-				case GL_FLOAT:			TypeSize = sizeof(GLfloat); break;
-				case GL_DOUBLE:			TypeSize = sizeof(GLdouble); break;
-				case GL_BYTE:			TypeSize = sizeof(GLbyte); break;
-				case GL_UNSIGNED_BYTE:	TypeSize = sizeof(GLubyte); break;
-				case GL_SHORT:			TypeSize = sizeof(GLshort); break;
-				case GL_UNSIGNED_SHORT: TypeSize = sizeof(GLushort); break;
-				case GL_INT:			TypeSize = sizeof(GLint); break;
-				case GL_UNSIGNED_INT:	TypeSize = sizeof(GLuint); break;
-				default:				TypeSize = sizeof(GLfloat); break;
-			}
-			// clang-format: on
-			return TypeSize * Attribute::Size;
 		}
 
 		// -------------------------------------------------------------------------------

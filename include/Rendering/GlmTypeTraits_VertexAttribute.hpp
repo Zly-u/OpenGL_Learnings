@@ -11,85 +11,97 @@ struct GLMTypeTrait { };
 
 template<>
 struct GLMTypeTrait<glm::vec2> {
+	using ComponentType = float;
+
     static constexpr GLint Size = 2;
-    static constexpr GLenum Type = GL_FLOAT;
-    using ComponentType = float;
+    static constexpr GLenum EnumType = GL_FLOAT;
 };
 
 template<>
 struct GLMTypeTrait<glm::vec3> {
-    static constexpr GLint Size = 3;
-    static constexpr GLenum Type = GL_FLOAT;
     using ComponentType = float;
+
+    static constexpr GLint Size = 3;
+    static constexpr GLenum EnumType = GL_FLOAT;
 };
 
 template<>
 struct GLMTypeTrait<glm::vec4> {
-    static constexpr GLint Size = 4;
-    static constexpr GLenum Type = GL_FLOAT;
     using ComponentType = float;
+
+    static constexpr GLint Size = 4;
+    static constexpr GLenum EnumType = GL_FLOAT;
 };
 
 template<>
 struct GLMTypeTrait<glm::ivec2> {
-    static constexpr GLint Size = 2;
-    static constexpr GLenum Type = GL_INT;
     using ComponentType = int;
+
+    static constexpr GLint Size = 2;
+    static constexpr GLenum EnumType = GL_INT;
 };
 
 template<>
 struct GLMTypeTrait<glm::ivec3> {
-    static constexpr GLint Size = 3;
-    static constexpr GLenum Type = GL_INT;
     using ComponentType = int;
+
+    static constexpr GLint Size = 3;
+    static constexpr GLenum EnumType = GL_INT;
 };
 
 template<>
 struct GLMTypeTrait<glm::ivec4> {
-    static constexpr GLint Size = 4;
-    static constexpr GLenum Type = GL_INT;
     using ComponentType = int;
+
+    static constexpr GLint Size = 4;
+    static constexpr GLenum EnumType = GL_INT;
 };
 
 template<>
 struct GLMTypeTrait<glm::uvec2> {
-    static constexpr GLint Size = 2;
-    static constexpr GLenum Type = GL_UNSIGNED_INT;
     using ComponentType = unsigned int;
+
+    static constexpr GLint Size = 2;
+    static constexpr GLenum EnumType = GL_UNSIGNED_INT;
 };
 
 template<>
 struct GLMTypeTrait<glm::uvec3> {
-    static constexpr GLint Size = 3;
-    static constexpr GLenum Type = GL_UNSIGNED_INT;
     using ComponentType = unsigned int;
+
+    static constexpr GLint Size = 3;
+    static constexpr GLenum EnumType = GL_UNSIGNED_INT;
 };
 
 template<>
 struct GLMTypeTrait<glm::uvec4> {
-    static constexpr GLint Size = 4;
-    static constexpr GLenum Type = GL_UNSIGNED_INT;
     using ComponentType = unsigned int;
+
+    static constexpr GLint Size = 4;
+    static constexpr GLenum EnumType = GL_UNSIGNED_INT;
 };
 
 // Double precision vectors
 template<>
 struct GLMTypeTrait<glm::dvec2> {
-    static constexpr GLint Size = 2;
-    static constexpr GLenum Type = GL_DOUBLE;
     using ComponentType = double;
+
+    static constexpr GLint Size = 2;
+    static constexpr GLenum EnumType = GL_DOUBLE;
 };
 
 template<>
 struct GLMTypeTrait<glm::dvec3> {
-    static constexpr GLint Size = 3;
-    static constexpr GLenum Type = GL_DOUBLE;
     using ComponentType = double;
+
+    static constexpr GLint Size = 3;
+    static constexpr GLenum EnumType = GL_DOUBLE;
 };
 
 template<>
 struct GLMTypeTrait<glm::dvec4> {
-    static constexpr GLint Size = 4;
-    static constexpr GLenum Type = GL_DOUBLE;
     using ComponentType = double;
+
+    static constexpr GLint Size = 4;
+    static constexpr GLenum EnumType = GL_DOUBLE;
 };

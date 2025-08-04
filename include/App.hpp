@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Delegates.h"
 #include "Rendering/Renderer.hpp"
 
 #include <GLFW/glfw3.h>
 #include <expected>
-#include <glm/vec2.hpp>
 #include <memory>
 #include <string_view>
 
@@ -20,6 +20,8 @@ class App {
 
 		static App& Get();
 
+	public:
+		Delegate<> OnWindowResized;
 
 	public:
 		std::expected<bool, std::string_view> Init();

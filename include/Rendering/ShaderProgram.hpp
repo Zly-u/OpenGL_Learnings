@@ -3,7 +3,7 @@
 #include "Logging.h"
 #include "Random.h"
 
-#include "TVertexArrayObject.hpp"
+#include "TVertexArrayObjectHandler.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include "ShaderUniformsDescriptor.hpp"
@@ -56,7 +56,7 @@ class ShaderProgram
 
 			Use();
 
-			VAO.Bind();
+			VAO_Handler.Bind();
 
 			GraphicsUpdateFunc();
 
@@ -84,7 +84,7 @@ class ShaderProgram
 
 
 	private:
-		int64_t LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) const
+		[[nodiscard]] int64_t LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) const
 		{
 			std::ifstream File(ShaderFile.data());
 
@@ -171,7 +171,7 @@ class ShaderProgram
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
 
-			VAO.Bind();
+			VAO_Handler.Bind();
 
 			// Vertex buffer
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -181,20 +181,19 @@ class ShaderProgram
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
-			VAO.SetupVertexAttributes();
+			VAO_Handler.SetupVertexAttributes();
 
-			VAO.Unbind();
+			VAO_Handler.Unbind();
 		}
 
 	public:
-		VertexArrayObject<VertexDataType, TAttributeListType> VAO;
+		VertexArrayObjectHandler<VertexDataType, TAttributeListType> VAO_Handler;
+		ShaderUniformsDescriptor<TUniformsListType> UniformsDescriptor;
 
 		uint32_t VBO = 0;
 		uint32_t EBO = 0;
 
 		uint32_t ShaderProgramID = 0;
-
-		ShaderUniformsDescriptor<TUniformsListType> UniformsDescriptor;
 
 
 	public:

@@ -18,9 +18,9 @@ class Sprite
 	public:
 		struct SpriteVertexData
 		{
-				glm::vec2 Position;
-				glm::vec3 Color;
-				glm::vec2 UV;
+			glm::vec2 Position;
+			glm::vec3 Color;
+			glm::vec2 UV;
 		};
 
 		using SpriteSPType = ShaderProgram<

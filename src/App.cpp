@@ -100,6 +100,8 @@ void App::WindowResizedCallback(const int NewWidth, const int NewHeight)
 
 	TheRenderer->UpdateProjection(BaseWindowSize);
 
+	OnWindowResized.Broadcast();
+
 	// Update Render on resize.
 	TheRenderer->Render(Window, Sprites);
 }
