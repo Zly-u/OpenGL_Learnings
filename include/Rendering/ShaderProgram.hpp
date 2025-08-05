@@ -34,6 +34,7 @@ class ShaderProgram
 		) :
 			Vertices(NewVertices)
 		{
+			Log::println("Created ShaderProgram");
 			PrepareShaders(VertexShader, FragmentShader);
 			PreparePolygon();
 		}

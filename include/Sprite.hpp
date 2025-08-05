@@ -29,6 +29,31 @@ class Sprite
 			ShaderUniformsList<Texture0Uniform, TransformUniform, ProjectionUniform>
 		>;
 
+		// clang-format off
+		inline static const std::array<SpriteVertexData, 4> SpriteVertices = {
+			SpriteVertexData
+			{
+				.Position = { -.5f, .5f },
+				.Color    = { 1.0f, 1.0f, 1.0f },
+				.UV       = { 0.0f, 0.0f }
+			},
+			{
+				.Position = { .5f, .5f },
+				.Color    = { 1.0f, 1.0f, 1.0f },
+				.UV       = { 1.0f, 0.0f }
+			},
+			{
+				.Position = { .5f, -.5f },
+				.Color    = { 1.0f, 1.0f, 1.0f },
+				.UV       = { 1.0f, 1.0f }
+			},
+			{
+				.Position = { -.5f, -.5f },
+				.Color    = { 1.0f, 1.0f, 1.0f },
+				.UV       = { 0.0f, 1.0f }
+			}
+		};
+		// clang-format on
 
 	public:
 		explicit Sprite(const std::string_view& ImagePath);

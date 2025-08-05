@@ -8,34 +8,12 @@
 #include "Logging.h"
 #include "Random.h"
 
-// clang-format off
-static const std::array<Sprite::SpriteVertexData, 4> SpriteVertices = {
-	Sprite::SpriteVertexData
-	{
-		.Position = { -.5f, .5f },
-		.Color    = { 1.0f, 1.0f, 1.0f },
-		.UV       = { 0.0f, 0.0f }
-	},
-	{
-		.Position = { .5f, .5f },
-		.Color    = { 1.0f, 1.0f, 1.0f },
-		.UV       = { 1.0f, 0.0f }
-	},
-	{
-		.Position = { .5f, -.5f },
-		.Color    = { 1.0f, 1.0f, 1.0f },
-		.UV       = { 1.0f, 1.0f }
-	},
-	{
-		.Position = { -.5f, -.5f },
-		.Color    = { 1.0f, 1.0f, 1.0f },
-		.UV       = { 0.0f, 1.0f }
-	}
-};
-// clang-format on
 
-Sprite::Sprite(const std::string_view& ImagePath) : SpriteRenderer(new SpriteSPType("shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices))
+Sprite::Sprite(const std::string_view& ImagePath)
 {
+	static SpriteSPType StaticSpriteRenderer{"shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices};
+	SpriteRenderer = &StaticSpriteRenderer;
+
 	LoadImage(ImagePath);
 }
 
