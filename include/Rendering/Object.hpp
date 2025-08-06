@@ -4,17 +4,18 @@
 #include <string>
 #include <string_view>
 
+
+class ShaderProgramBase;
+
 class Object
 {
 	public:
 		virtual ~Object() {}
 
 		virtual void Init() = 0;
-		virtual void Update(const float DeltaTime) = 0;
-		virtual void Render(const glm::mat4& Projection) = 0;
+		virtual void Update(const float DeltaTime);
+		virtual void Render(const glm::mat4& Projection);
 
-
-		void LoadImage(const std::string_view& ImagePath);
 
 	public:
 		std::string Name;
@@ -28,5 +29,6 @@ class Object
 
 
 	protected:
+		ShaderProgramBase* ObjectRenderer = nullptr;
 		uint32_t TextureID = 0;
 };

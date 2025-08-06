@@ -165,13 +165,15 @@ void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		ScreenRenderer.Render(
-			[&](ScreenSP* ShaderProgram)
+			[&](ShaderProgramBase* ShaderProgram)
 			{
+				auto* ScreenRenderer1 = dynamic_cast<ScreenSP*>(ShaderProgram);
+
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
-				ShaderProgram->UniformsDescriptor.SetUniform<TextureScreenUniform>(0); // 0 corresponds to GL_TEXTURE0
+				ScreenRenderer1->UniformsDescriptor.SetUniform<TextureScreenUniform>(0); // 0 corresponds to GL_TEXTURE0
 			},
-			[&](ScreenSP* ShaderProgram)
+			[&](ShaderProgramBase* ShaderProgram)
 			{
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}

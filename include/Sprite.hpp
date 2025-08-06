@@ -62,8 +62,4 @@ class Sprite : public Object
 
 		void Update(const float DeltaTime) override;
 		void Render(const glm::mat4& Projection) override;
-
-
-	private:
-		SpriteSPType* SpriteRenderer;
 };

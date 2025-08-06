@@ -1,19 +1,20 @@
 #include "SpritePixelization.hpp"
 
+#include "AssetsManager.hpp"
+
 #include <GLFW/glfw3.h>
-#include <glm/ext/matrix_transform.hpp>
 
 
 SpritePixelization::SpritePixelization(const std::string_view& ImagePath)
 {
-	static SpritePxSPType StaticSpriteRenderer{
+	static SpritePxSPType* StaticSpriteRenderer = new SpritePxSPType{
 		"shaders/vertex.glsl",
 		"shaders/fragment_pixelating.glsl",
 		SpriteVertices
 	};
-	SpriteRenderer = &StaticSpriteRenderer;
+	ObjectRenderer = StaticSpriteRenderer;
 
-	LoadImage(ImagePath);
+	AssetsManager::LoadImage(ImagePath, TextureID, SpriteTexSize);
 }
 
 SpritePixelization::~SpritePixelization()
@@ -38,29 +39,25 @@ void SpritePixelization::Update(const float DeltaTime)
 }
 
 
-void SpritePixelization::Render(const glm::mat4& Projection) {
-	glm::mat4 Transform{1.0f};
+void SpritePixelization::Render(const glm::mat4& Projection)
+{
+	Object::Render(Projection);
 
-	Transform = glm::translate(Transform, glm::vec3(Location.x, Location.y, ZDepth));
-	Transform = glm::rotate(Transform, glm::radians(Rotation), glm::vec3(0.0, 0.0, 1.0));
-	Transform = glm::scale(Transform, glm::vec3(Scale + SpriteTexSize, 0.f));
+	ObjectRenderer->Render(
+		[&] (ShaderProgramBase* ShaderProgram){
+			auto SpriteRenderer = dynamic_cast<SpritePxSPType*>(ShaderProgram);
 
-	SpriteRenderer->SetTransform(Transform);
-	SpriteRenderer->SetProjection(Projection);
-
-	SpriteRenderer->Render(
-		[&] (SpritePxSPType* ShaderProgram){
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureID);
 
 			SpriteRenderer->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
 
-			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(ShaderProgram->Transform);
-			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(ShaderProgram->Projection);
+			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(SpriteRenderer->Transform);
+			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(SpriteRenderer->Projection);
 
 			SpriteRenderer->UniformsDescriptor.SetUniform<PixelationUniform>(PixelationLevel);
 		},
-		[&](SpritePxSPType* ShaderProgram)
+		[&](ShaderProgramBase* ShaderProgram)
 		{
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}

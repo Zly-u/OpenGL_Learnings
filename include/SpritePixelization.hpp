@@ -65,6 +65,5 @@ class SpritePixelization : public Object
 
 
 	private:
-		SpritePxSPType* SpriteRenderer;
 		float PixelationLevel = 1.f;
 };

@@ -6,6 +6,8 @@
 #include "Logging.h"
 #include "SpritePixelization.hpp"
 
+#include <chrono>
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void WindowResizedCallbackWrapper(
@@ -80,7 +82,7 @@ std::expected<bool, std::string_view> App::Init()
 
 void App::PostInit()
 {
-	Objects.reserve(100);
+	Objects.reserve(5000);
 
 	Sprite* Sprite_0   = CreateRenderable<Sprite>("Assets/AmyAAAA.png");
 	Sprite_0->Name     = "Amy1";
@@ -89,6 +91,23 @@ void App::PostInit()
 	SpritePixelization* Sprite_1 = CreateRenderable<SpritePixelization>("Assets/AmyM.png");
 	Sprite_1->Name     = "Amy2";
 	Sprite_1->Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
+
+	auto ChronoStart = std::chrono::high_resolution_clock::now();
+	for (int Index = 0; Index < 10000; ++Index)
+	{
+		Sprite* NewSprite = CreateRenderable<Sprite>("Assets/AmyAAAA.png");
+
+		NewSprite->Location = glm::vec2(
+			Random::Normal() * WindowSize.x,
+			Random::Normal() * WindowSize.y
+		);
+		NewSprite->ZDepth = -Random::Normal() * 100;
+		NewSprite->Scale = glm::vec2(1.f) * Random::RangeFloat(0.1f, 0.5f);
+		NewSprite->Rotation = Random::RangeFloat(-1.f, 1.f) * 180.f;
+	}
+	auto ChronoEnd = std::chrono::high_resolution_clock::now();
+	auto Duration = std::chrono::duration_cast<std::chrono::microseconds>(ChronoEnd - ChronoStart);
+	Log::println("Objects creation took: {:.2f} sec", float(float(Duration.count()) / 1000000.f));
 }
 
 

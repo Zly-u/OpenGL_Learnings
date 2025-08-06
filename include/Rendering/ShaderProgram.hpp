@@ -11,7 +11,6 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <fstream>
-#include <sstream>
 
 #include <array>
 #include <glad/glad.h>
@@ -40,6 +39,12 @@ class ShaderProgramBase
 			glUseProgram(ShaderProgramID);
 		}
 
+		using GraphicsUpdatingFuncSign = std::function<void(ShaderProgramBase*)>;
+		virtual void Render(
+			const GraphicsUpdatingFuncSign& GraphicsUpdateFunc,
+			const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc
+		) = 0;
+
 	public:
 		__forceinline void SetTransform(const glm::mat4& NewTransform)
 		{
@@ -53,45 +58,8 @@ class ShaderProgramBase
 
 
 	protected:
-		[[nodiscard]] int64_t LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) const
-		{
-			std::ifstream File(ShaderFile.data());
-
-			if (File.fail())
-			{
-				Log::println("Error opening shader file: {}", ShaderFile);
-				return -1;
-			}
-
-			std::stringstream Buffer_ShaderShader;
-			Buffer_ShaderShader << File.rdbuf();
-			std::string ShaderContent = Buffer_ShaderShader.str();
-
-			const char* VertexShaderData      = ShaderContent.c_str();
-			const GLint VertexShaderData_Size = static_cast<GLint>(ShaderContent.size());
-
-			const GLuint NewShaderID = glCreateShader(ShaderType);
-			glShaderSource(NewShaderID, 1, &VertexShaderData, &VertexShaderData_Size);
-			glCompileShader(NewShaderID);
-
-			int Success;
-			glGetShaderiv(NewShaderID, GL_COMPILE_STATUS, &Success);
-			if (!Success)
-			{
-				char infoLog[512];
-				glGetShaderInfoLog(NewShaderID, 512, nullptr, infoLog);
-
-				Log::println(
-					"ERROR::SHADER::{}::COMPILATION_FAILED: {}",
-					ShaderType == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT",
-					infoLog
-				);
-
-				return -1;
-			}
-
-			return NewShaderID;
-		}
+		[[nodiscard]] int64_t
+		LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) const;
 
 		virtual void PrepareShaders(const std::string_view& VertexShader, const std::string_view& FragmentShader) {}
 		virtual void PreparePolygon() {}
@@ -109,10 +77,8 @@ class ShaderProgramBase
 // ---------------------------------------------------------------------------------------
 
 template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
-class ShaderProgram : public ShaderProgramBase
+class ShaderProgram final : public ShaderProgramBase
 {
-	using GraphicsUpdatingFuncSign = std::function<void(ShaderProgram*)>;
-
 	public:
 		ShaderProgram(
 			const std::string_view& VertexShader,
@@ -132,10 +98,10 @@ class ShaderProgram : public ShaderProgramBase
 
 		// ---------------------------------------------------------------------------------------
 
-		__forceinline void Render(
+		void Render(
 			const GraphicsUpdatingFuncSign& GraphicsUpdateFunc,
 			const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc
-		)
+		) override
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

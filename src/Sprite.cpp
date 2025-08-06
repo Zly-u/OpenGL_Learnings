@@ -1,20 +1,21 @@
 
 #include "Sprite.hpp"
 
+#include "AssetsManager.hpp"
+
 #include <GLFW/glfw3.h>
-#include <glm/ext/matrix_transform.hpp>
 
 
 Sprite::Sprite(const std::string_view& ImagePath)
 {
-	static SpriteSPType StaticSpriteRenderer{
+	static SpriteSPType* StaticSpriteRenderer = new SpriteSPType{
 		"shaders/vertex.glsl",
 		"shaders/fragment.glsl",
 		SpriteVertices
 	};
-	SpriteRenderer = &StaticSpriteRenderer;
+	ObjectRenderer = StaticSpriteRenderer;
 
-	LoadImage(ImagePath);
+	AssetsManager::LoadImage(ImagePath, TextureID, SpriteTexSize);
 }
 
 Sprite::~Sprite()
@@ -39,26 +40,21 @@ void Sprite::Update(const float DeltaTime)
 
 
 void Sprite::Render(const glm::mat4& Projection) {
-	glm::mat4 Transform{1.0f};
+	Object::Render(Projection);
 
-	Transform = glm::translate(Transform, glm::vec3(Location.x, Location.y, ZDepth));
-	Transform = glm::rotate(Transform, glm::radians(Rotation), glm::vec3(0.0, 0.0, 1.0));
-	Transform = glm::scale(Transform, glm::vec3(Scale + SpriteTexSize, 0.f));
+	ObjectRenderer->Render(
+		[&] (ShaderProgramBase* ShaderProgram){
+			auto ShaderProgram1 = dynamic_cast<SpriteSPType*>(ShaderProgram);
 
-	SpriteRenderer->SetTransform(Transform);
-	SpriteRenderer->SetProjection(Projection);
-
-	SpriteRenderer->Render(
-		[&] (SpriteSPType* ShaderProgram){
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureID);
 
-			SpriteRenderer->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
+			ShaderProgram1->UniformsDescriptor.SetUniform<Texture0Uniform>(0); // 0 corresponds to GL_TEXTURE0
 
-			SpriteRenderer->UniformsDescriptor.SetUniform<TransformUniform>(ShaderProgram->Transform);
-			SpriteRenderer->UniformsDescriptor.SetUniform<ProjectionUniform>(ShaderProgram->Projection);
+			ShaderProgram1->UniformsDescriptor.SetUniform<TransformUniform>(ShaderProgram1->Transform);
+			ShaderProgram1->UniformsDescriptor.SetUniform<ProjectionUniform>(ShaderProgram1->Projection);
 		},
-		[&](SpriteSPType* ShaderProgram)
+		[&](ShaderProgramBase* ShaderProgram)
 		{
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
