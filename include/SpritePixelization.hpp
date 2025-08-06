@@ -1,17 +1,17 @@
 #pragma once
 
-#include "Rendering/Object.hpp"
-#include "Rendering/ShaderProgram.hpp"
+#include "Sprite.hpp"
 
-class Sprite : public Object
+class SpritePixelization : public Object
 {
 	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
 	using ColorAttribute    = GLMVertexAttribute<1, glm::vec3>;
 	using UVAttribute       = GLMVertexAttribute<2, glm::vec2>;
 
-	using Texture0Uniform   = GLMShaderUniform<"Texture0", GLuint>;
 	using TransformUniform  = GLMShaderUniform<"PassedTransform", glm::mat4>;
 	using ProjectionUniform = GLMShaderUniform<"PassedProjection", glm::mat4>;
+	using Texture0Uniform   = GLMShaderUniform<"Texture0", GLuint>;
+	using PixelationUniform = GLMShaderUniform<"PixelationLevel", float>;
 
 
 	public:
@@ -22,10 +22,10 @@ class Sprite : public Object
 			glm::vec2 UV;
 		};
 
-		using SpriteSPType = ShaderProgram<
+		using SpritePxSPType = ShaderProgram<
 			SpriteVertexData,
 			VertexAttributesList<PositionAttribute, ColorAttribute, UVAttribute>,
-			ShaderUniformsList<Texture0Uniform, TransformUniform, ProjectionUniform>
+			ShaderUniformsList<Texture0Uniform, TransformUniform, ProjectionUniform, PixelationUniform>
 		>;
 
 		// clang-format off
@@ -55,8 +55,8 @@ class Sprite : public Object
 		// clang-format on
 
 	public:
-		explicit Sprite(const std::string_view& ImagePath);
-		~Sprite() override;
+		explicit SpritePixelization(const std::string_view& ImagePath);
+		~SpritePixelization() override;
 
 		void Init() override;
 
@@ -65,5 +65,6 @@ class Sprite : public Object
 
 
 	private:
-		SpriteSPType* SpriteRenderer;
+		SpritePxSPType* SpriteRenderer;
+		float PixelationLevel = 1.f;
 };

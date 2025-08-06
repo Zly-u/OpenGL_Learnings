@@ -132,7 +132,7 @@ class ShaderProgram : public ShaderProgramBase
 
 		// ---------------------------------------------------------------------------------------
 
-		void Render(
+		__forceinline void Render(
 			const GraphicsUpdatingFuncSign& GraphicsUpdateFunc,
 			const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc
 		)

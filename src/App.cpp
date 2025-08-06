@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 
 #include "Logging.h"
+#include "SpritePixelization.hpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -85,7 +86,7 @@ void App::PostInit()
 	Sprite_0->Name     = "Amy1";
 	Sprite_0->Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
 
-	Sprite* Sprite_1   = CreateRenderable<Sprite>("Assets/AmyM.png");
+	SpritePixelization* Sprite_1 = CreateRenderable<SpritePixelization>("Assets/AmyM.png");
 	Sprite_1->Name     = "Amy2";
 	Sprite_1->Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
 }
