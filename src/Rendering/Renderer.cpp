@@ -129,15 +129,17 @@ void Renderer::UpdateProjection(const glm::vec2& WindowSize)
 		0.0f, WindowSize.x,	// left, right
 		WindowSize.y, 0.0f,	// bottom, top (flipped Y to match top-left origin)
 		-1000.0f, 1000.0f   // near, far
-	)
-	* CameraView;
+	);
 
 	ViewProjection = Projection * CameraView;
 }
 
 
-void Renderer::Render(GLFWwindow* Window, std::vector<Object*>& Objects)
+void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 {
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	// First pass - render scene
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
@@ -162,7 +164,7 @@ void Renderer::Render(GLFWwindow* Window, std::vector<Object*>& Objects)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		ScreenRenderer.Render<ScreenSP>(
+		ScreenRenderer.Render(
 			[&](ScreenSP* ShaderProgram)
 			{
 				glActiveTexture(GL_TEXTURE0);

@@ -19,60 +19,26 @@
 
 // ---------------------------------------------------------------------------------------
 
-template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
-class ShaderProgram
+class ShaderProgramBase
 {
-	template<typename ShaderProgramType>
-	using GraphicsUpdatingFuncSign = std::function<void(ShaderProgramType*)>;
-
 	public:
-		ShaderProgram(
+		ShaderProgramBase(
 			const std::string_view& VertexShader,
-			const std::string_view& FragmentShader,
-
-			const std::array<VertexDataType, 4>& NewVertices
-		) :
-			Vertices(NewVertices)
+			const std::string_view& FragmentShader
+		)
 		{
 			Log::println("Created ShaderProgram");
-			PrepareShaders(VertexShader, FragmentShader);
-			PreparePolygon();
+			ShaderProgramBase::PrepareShaders(VertexShader, FragmentShader);
+			ShaderProgramBase::PreparePolygon();
 		}
 
-		~ShaderProgram()
-		{
-			glDeleteBuffers(1, &VBO);
-			glDeleteBuffers(1, &EBO);
-		}
+		virtual ~ShaderProgramBase(){}
 
-		// ---------------------------------------------------------------------------------------
-
-		void Use()
+	public:
+		virtual void Use()
 		{
 			glUseProgram(ShaderProgramID);
 		}
-
-		template<typename ShaderProgramType>
-		void Render(const GraphicsUpdatingFuncSign<ShaderProgramType>& GraphicsUpdateFunc, const GraphicsUpdatingFuncSign<ShaderProgramType>& DeinitializeGraphicsFunc)
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-			Use();
-
-			VAO_Handler.Bind();
-
-			GraphicsUpdateFunc(this);
-
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-			// Unbind stuff
-			glBindVertexArray(0);
-
-			DeinitializeGraphicsFunc(this);
-
-			glUseProgram(0);
-		}
-
 
 	public:
 		__forceinline void SetTransform(const glm::mat4& NewTransform)
@@ -86,7 +52,7 @@ class ShaderProgram
 		}
 
 
-	private:
+	protected:
 		[[nodiscard]] int64_t LoadShaderFromFile(const std::string_view& ShaderFile, const GLenum ShaderType) const
 		{
 			std::ifstream File(ShaderFile.data());
@@ -127,7 +93,71 @@ class ShaderProgram
 			return NewShaderID;
 		}
 
-		void PrepareShaders(const std::string_view& VertexShader, const std::string_view& FragmentShader)
+		virtual void PrepareShaders(const std::string_view& VertexShader, const std::string_view& FragmentShader) {}
+		virtual void PreparePolygon() {}
+
+	public:
+		uint32_t ShaderProgramID = 0;
+
+
+	public:
+		glm::mat4 Transform{ 1.f };
+		glm::mat4 Projection{ 1.f };
+
+};
+
+// ---------------------------------------------------------------------------------------
+
+template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
+class ShaderProgram : public ShaderProgramBase
+{
+	using GraphicsUpdatingFuncSign = std::function<void(ShaderProgram*)>;
+
+	public:
+		ShaderProgram(
+			const std::string_view& VertexShader,
+			const std::string_view& FragmentShader,
+			const std::array<VertexDataType, 4>& NewVertices
+		) : ShaderProgramBase(VertexShader, FragmentShader), Vertices(NewVertices)
+		{
+			ShaderProgram::PrepareShaders(VertexShader, FragmentShader);
+			ShaderProgram::PreparePolygon();
+		}
+
+		~ShaderProgram() override
+		{
+			glDeleteBuffers(1, &VBO);
+			glDeleteBuffers(1, &EBO);
+		}
+
+		// ---------------------------------------------------------------------------------------
+
+		void Render(
+			const GraphicsUpdatingFuncSign& GraphicsUpdateFunc,
+			const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc
+		)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+			Use();
+
+			VAO_Handler.Bind();
+
+			GraphicsUpdateFunc(this);
+
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			// Unbind stuff
+			glBindVertexArray(0);
+
+			DeinitializeGraphicsFunc(this);
+
+			glUseProgram(0);
+		}
+
+
+	protected:
+		void PrepareShaders(const std::string_view& VertexShader, const std::string_view& FragmentShader) override
 		{
 			const int64_t VertexShaderID = LoadShaderFromFile(VertexShader, GL_VERTEX_SHADER);
 			if (VertexShaderID == -1)
@@ -164,7 +194,7 @@ class ShaderProgram
 			UniformsDescriptor.SetShaderProgramID(ShaderProgramID);
 		}
 
-		void PreparePolygon()
+		void PreparePolygon() override
 		{
 			static const uint32_t Indices[] = {
 				0, 1, 2,    // first triangle
@@ -196,14 +226,6 @@ class ShaderProgram
 		uint32_t VBO = 0;
 		uint32_t EBO = 0;
 
-		uint32_t ShaderProgramID = 0;
-
-
 	public:
-		glm::mat4 Transform{ 1.f };
-		glm::mat4 Projection{ 1.f };
-
-
-	private:
 		const std::array<VertexDataType, 4>& Vertices;
 };

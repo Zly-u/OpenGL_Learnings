@@ -29,11 +29,12 @@ class Renderer
 	public:
 		Renderer();
 		~Renderer();
-		void Cleanup();
+
 		void InitializeBuffers();
+		void Cleanup();
 
 		void UpdateProjection(const glm::vec2& WindowSize);
-		void Render(GLFWwindow* Window, std::vector<Object*>& Objects);
+		void Render(GLFWwindow* Window, const std::vector<Object*>& Objects);
 
 
 	private:

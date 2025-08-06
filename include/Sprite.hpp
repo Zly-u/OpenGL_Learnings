@@ -61,24 +61,11 @@ class Sprite : public Object
 		~Sprite() override;
 
 		void Init() override;
-		void LoadImage(const std::string_view& ImagePath);
 
 		void Update(const float DeltaTime) override;
 		void Render(const glm::mat4& Projection) override;
 
 
-	public:
-		std::string Name;
-		glm::vec2   SpriteTexSize{ 1.f };
-
-		glm::vec2 Location{ 0.f };
-		float     Rotation = 0.f;
-		glm::vec2 Scale{ 1.f };
-
-		float ZDepth = 0.f;
-
-
 	private:
 		SpriteSPType* SpriteRenderer;
-		uint32_t      TextureID = 0;
 };
