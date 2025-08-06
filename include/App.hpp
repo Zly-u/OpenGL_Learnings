@@ -48,6 +48,9 @@ class App {
 	private:
 		__forceinline void UpdateDeltaTime();
 
+	public:
+		void SetWindowTitle(const std::string& Title) const;
+
 	private:
 		// For setting up the base resolution for the monitor.
 		glm::vec2 BaseWindowSize{1280.f, 720.f};

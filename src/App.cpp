@@ -131,11 +131,20 @@ void App::Update(const float DeltaTime)
 }
 
 
+float FpsTimer = 0.5;
+float FpsCurrentTime = 0.f;
 void App::GameLoop()
 {
 	while (!glfwWindowShouldClose(Window))
 	{
 		UpdateDeltaTime();
+
+		FpsCurrentTime -= DeltaTime;
+		if (FpsCurrentTime <= 0.f)
+		{
+			SetWindowTitle(std::format("FPS: {:.2f}", 1.f/DeltaTime));
+			FpsCurrentTime = FpsTimer;
+		}
 
 		ProcessInput();
 
@@ -159,4 +168,9 @@ void App::UpdateDeltaTime()
 	const float Ticks = glfwGetTime();
 	DeltaTime         = Ticks - PreviousFrameTime;
 	PreviousFrameTime = Ticks;
+}
+
+void App::SetWindowTitle(const std::string& Title) const
+{
+	glfwSetWindowTitle(Window, Title.c_str());
 }
