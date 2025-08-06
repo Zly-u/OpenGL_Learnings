@@ -20,8 +20,10 @@ class App {
 
 		static App& Get();
 
+
 	public:
 		Delegate<> OnWindowResized;
+
 
 	public:
 		std::expected<bool, std::string_view> Init();
@@ -34,6 +36,15 @@ class App {
 		void Update(const float DeltaTime);
 		void GameLoop();
 
+		template<typename RenderableType, typename... Args>
+		RenderableType* CreateRenderable(Args... CtorArgs)
+		{
+			auto* NewObject = new RenderableType(std::forward<Args>(CtorArgs)...);
+			Objects.emplace_back(NewObject);
+			return NewObject;
+		}
+
+
 	private:
 		__forceinline void UpdateDeltaTime();
 
@@ -45,7 +56,7 @@ class App {
 		glm::vec2 WindowSize{1280.f, 720.f};
 
 		// NOTE: Temporarily here cuz we have no Scenes or Levels to store them.
-		std::vector<Sprite> Sprites;
+		std::vector<Object*> Objects;
 
 
 	private:

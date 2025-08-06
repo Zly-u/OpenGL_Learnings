@@ -6,17 +6,21 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "Logging.h"
-#include "Random.h"
 
 
 Sprite::Sprite(const std::string_view& ImagePath)
 {
-	static SpriteSPType StaticSpriteRenderer{"shaders/vertex.glsl", "shaders/fragment.glsl", SpriteVertices};
+	static SpriteSPType StaticSpriteRenderer{ "shaders/vertex.glsl",
+		                                      "shaders/fragment.glsl",
+		                                      SpriteVertices };
 	SpriteRenderer = &StaticSpriteRenderer;
 
 	LoadImage(ImagePath);
 }
 
+Sprite::~Sprite()
+{
+}
 
 void Sprite::Init() {
 }

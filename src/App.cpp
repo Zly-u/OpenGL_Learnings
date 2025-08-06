@@ -79,15 +79,15 @@ std::expected<bool, std::string_view> App::Init()
 
 void App::PostInit()
 {
-	Sprites.reserve(100);
+	Objects.reserve(100);
 
-	Sprite& Sprite_0  = Sprites.emplace_back("Assets/AmyAAAA.png");
-	Sprite_0.Name     = "Amy1";
-	Sprite_0.Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
+	Sprite* Sprite_0   = CreateRenderable<Sprite>("Assets/AmyAAAA.png");
+	Sprite_0->Name     = "Amy1";
+	Sprite_0->Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
 
-	Sprite& Sprite_1  = Sprites.emplace_back("Assets/AmyM.png");
-	Sprite_1.Name     = "Amy2";
-	Sprite_1.Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
+	Sprite* Sprite_1   = CreateRenderable<Sprite>("Assets/AmyM.png");
+	Sprite_1->Name     = "Amy2";
+	Sprite_1->Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
 }
 
 
@@ -103,7 +103,7 @@ void App::WindowResizedCallback(const int NewWidth, const int NewHeight)
 	OnWindowResized.Broadcast();
 
 	// Update Render on resize.
-	TheRenderer->Render(Window, Sprites);
+	TheRenderer->Render(Window, Objects);
 }
 
 
@@ -124,9 +124,9 @@ void App::ProcessInput()
 
 void App::Update(const float DeltaTime)
 {
-	for (Sprite& Sprite : Sprites)
+	for (Object* Object : Objects)
 	{
-		Sprite.Update(DeltaTime);
+		Object->Update(DeltaTime);
 	}
 }
 
@@ -142,7 +142,7 @@ void App::GameLoop()
 		Update(DeltaTime);
 
 		TheRenderer->UpdateProjection(BaseWindowSize);
-		TheRenderer->Render(Window, Sprites);
+		TheRenderer->Render(Window, Objects);
 
 		if (GLenum GlError = glGetError(); GlError != GL_NO_ERROR)
 		{

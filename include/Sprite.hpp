@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Rendering/Object.hpp"
 #include "Rendering/ShaderProgram.hpp"
 
 #include <string>
 
-class Sprite
+class Sprite : public Object
 {
 	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
 	using ColorAttribute    = GLMVertexAttribute<1, glm::vec3>;
@@ -57,12 +58,13 @@ class Sprite
 
 	public:
 		explicit Sprite(const std::string_view& ImagePath);
+		~Sprite() override;
 
-		void Init();
+		void Init() override;
 		void LoadImage(const std::string_view& ImagePath);
 
-		void Update(const float DeltaTime);
-		void Render(const glm::mat4& Projection);
+		void Update(const float DeltaTime) override;
+		void Render(const glm::mat4& Projection) override;
 
 
 	public:

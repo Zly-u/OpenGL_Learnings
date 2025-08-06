@@ -33,7 +33,7 @@ class Renderer
 		void InitializeBuffers();
 
 		void UpdateProjection(const glm::vec2& WindowSize);
-		void Render(GLFWwindow* Window, std::vector<Sprite>& Sprites);
+		void Render(GLFWwindow* Window, std::vector<Object*>& Objects);
 
 
 	private:
