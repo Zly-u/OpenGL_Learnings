@@ -6,13 +6,18 @@
 #include "stb_image.h"
 #include <glad/glad.h>
 
-void AssetsManager::LoadImage(const std::string_view& ImagePath, uint32_t& OutTextureID, glm::vec2& OutImageSize)
+
+void AssetsManager::LoadImage(
+	const std::string_view& Asset,
+	uint32_t&               OutTextureID,
+	glm::vec2&              OutImageSize
+)
 {
-	if (auto FoundTexture = TextureIDs.find(ImagePath); FoundTexture != TextureIDs.end())
+	if (auto FoundTexture = TextureIDs.find(Asset); FoundTexture != TextureIDs.end())
 	{
 		auto& [ID, Size] = FoundTexture->second;
-		OutTextureID = ID;
-		OutImageSize = Size;
+		OutTextureID     = ID;
+		OutImageSize     = Size;
 
 		return;
 	}
@@ -20,10 +25,10 @@ void AssetsManager::LoadImage(const std::string_view& ImagePath, uint32_t& OutTe
 	stbi_set_flip_vertically_on_load(true);
 
 	int            ImageWidth, ImageHeight, ColorChannels;
-	unsigned char* ImageData = stbi_load(ImagePath.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
+	unsigned char* ImageData = stbi_load(Asset.data(), &ImageWidth, &ImageHeight, &ColorChannels, 0);
 	if (!ImageData)
 	{
-		Log::println("[ERROR]: Failed to load an image: {}", ImagePath);
+		Log::println("[ERROR]: Failed to load an image: {}", Asset);
 		return;
 	}
 
@@ -31,28 +36,31 @@ void AssetsManager::LoadImage(const std::string_view& ImagePath, uint32_t& OutTe
 
 	// Determine format based on channels
 	GLenum ColorFormat = GL_RGB;
-	if (ColorChannels == 1)
-	{
-		ColorFormat = GL_RED;
-	}
-	else if (ColorChannels == 3)
+	GLenum InternalFormat = GL_RGB8;
+	if (ColorChannels == 3)
 	{
 		ColorFormat = GL_RGB;
+		InternalFormat = GL_RGB8;
 	}
 	else if (ColorChannels == 4)
 	{
 		ColorFormat = GL_RGBA;
+		InternalFormat = GL_RGBA8;
 	}
 
+	Log::println("[INFO]: Loaded an image: {}, with colors of firs pixel: {}, {}, {}, {}", Asset, ImageData[0], ImageData[1], ImageData[2], ImageData[3]);
+
 	int rowAlignment = 1;
-	if ((ImageWidth * ColorChannels) % 4 == 0)
+	const int BytesPerRow = ImageWidth * ColorChannels;
+	if (BytesPerRow % 4 == 0)
 	{
 		rowAlignment = 4;
 	}
-	else if ((ImageWidth * ColorChannels) % 2 == 0)
+	else if (BytesPerRow % 2 == 0)
 	{
 		rowAlignment = 2;
 	}
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, rowAlignment);
 
 	glGenTextures(1, &OutTextureID);
@@ -67,7 +75,7 @@ void AssetsManager::LoadImage(const std::string_view& ImagePath, uint32_t& OutTe
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		GL_RGB,
+		InternalFormat,
 		ImageWidth,
 		ImageHeight,
 		0,    // Legacy arg.
@@ -81,5 +89,8 @@ void AssetsManager::LoadImage(const std::string_view& ImagePath, uint32_t& OutTe
 
 	stbi_image_free(ImageData);
 
-	TextureIDs.emplace(ImagePath, std::make_pair(OutTextureID, OutImageSize));
+	TextureIDs.emplace(Asset, std::make_pair(OutTextureID, OutImageSize));
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
+

@@ -103,7 +103,7 @@ class ShaderProgram final : public ShaderProgramBase
 			const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc
 		) override
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			Use();
 

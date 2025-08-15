@@ -36,6 +36,8 @@ class App {
 		void Update(const float DeltaTime);
 		void GameLoop();
 
+		void SortObjects();
+
 		template<typename RenderableType, typename... Args>
 		RenderableType* CreateRenderable(Args... CtorArgs)
 		{

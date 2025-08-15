@@ -137,16 +137,17 @@ void Renderer::UpdateProjection(const glm::vec2& WindowSize)
 
 void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 {
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	// First pass - render scene
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
-		glEnable(GL_DEPTH_TEST);
+		// glEnable(GL_DEPTH_TEST);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendEquation(GL_FUNC_ADD);
 
 		for (Object* Sprite : Objects)
 		{
@@ -159,10 +160,12 @@ void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 	// Second pass - display rendered scene on a screen polygon
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-		glDisable(GL_DEPTH_TEST);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
 
 		ScreenRenderer.Render(
 			[&](ShaderProgramBase* ShaderProgram)
