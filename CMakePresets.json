@@ -95,21 +95,68 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "RelWithDebInfo"
 			}
+		},
+
+
+		{
+			"name": "action-default-gcc",
+			"inherits": "default",
+			"hidden": true,
+			"displayName": "Default config (GCC)",
+			"description": "This is a configuration for CI/DI.",
+			"cacheVariables": {
+				"VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic",
+				"CMAKE_C_COMPILER": "x86_64-w64-mingw32-gcc",
+				"CMAKE_CXX_COMPILER": "x86_64-w64-mingw32-g++",
+				"CMAKE_RC_COMPILER": "x86_64-w64-mingw32-windres",
+				"CMAKE_FIND_ROOT_PATH": "/usr/x86_64-w64-mingw32",
+				"CMAKE_FIND_ROOT_PATH_MODE_PROGRAM": "NEVER",
+				"CMAKE_FIND_ROOT_PATH_MODE_LIBRARY": "ONLY",
+				"CMAKE_FIND_ROOT_PATH_MODE_INCLUDE": "ONLY"
+			}
+		},
+
+		{
+			"name": "Action-Debug-gcc",
+			"inherits": "action-default-gcc",
+			"displayName": "CI/DI Action Debug-gcc",
+			"description": "CI/DI Action Debug build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "Action-Release-gcc",
+			"inherits": "action-default-gcc",
+			"displayName": "CI/DI Action Release-gcc",
+			"description": "CI/DI Action Release build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
 		}
 	],
 
 	"buildPresets": [
 		{
-			"name": "Release-gcc",
-			"configurePreset": "Release-gcc"
+			"name": "Build-Release-gcc",
+			"configurePreset": "Release-gcc",
+			"nativeToolOptions": ["install"]
 		},
 		{
-			"name": "Debug-gcc",
-			"configurePreset": "Debug-gcc"
+			"name": "Build-Debug-gcc",
+			"configurePreset": "Debug-gcc",
+			"nativeToolOptions": ["install"]
+		},
+
+		{
+			"name": "Build-Action-Release-gcc",
+			"configurePreset": "Action-Release-gcc",
+			"nativeToolOptions": ["install"]
 		},
 		{
-			"name": "RelWithDebInfo-gcc",
-			"configurePreset": "RelWithDebInfo-gcc"
+			"name": "Build-Action-Debug-gcc",
+			"configurePreset": "Action-Debug-gcc",
+			"nativeToolOptions": ["install"]
 		}
 	]
 }

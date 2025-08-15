@@ -1,4 +1,4 @@
-[![Win Build](https://github.com/Zly-u/OpenGL_Learnings/actions/workflows/cmake-windows-build.yml/badge.svg)](https://github.com/Zly-u/OpenGL_Learnings/actions/workflows/cmake-windows-build.yml)
+[![Build](https://github.com/Zly-u/OpenGL_Learnings/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/Zly-u/OpenGL_Learnings/actions/workflows/cmake-build.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/b4b3993d20714510829ce51d808f099f)](https://app.codacy.com/gh/Zly-u/OpenGL_Learnings/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 # 2D OpenGL Learning area.
 
@@ -24,3 +24,5 @@ So... Just run the CMake build process the usual way you do, either via CLion, V
 And hopefully it works first try, I tried my best to make it as portable as possible.
 
 At Post-Compilation - all assets are moved into the same folder where executable is, everything is automatic.
+
+Additional note: I use G++ as a primary compiler, so if you are using MSVC there is a chance it might not compile.

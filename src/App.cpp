@@ -195,7 +195,6 @@ void App::SortObjects()
 			return A->ZDepth < B->ZDepth;
 		}
 	);
-
 }
 
 void App::UpdateDeltaTime()

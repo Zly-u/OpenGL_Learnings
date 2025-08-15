@@ -54,8 +54,8 @@ install(
 	DESTINATION ${G_BUILD_FOLDER}
 )
 
-add_custom_command(
-	TARGET ${G_PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR} --prefix ${CMAKE_BINARY_DIR}
-	COMMENT "[${G_PROJECT_NAME}::POST BUILD] Installing."
-)
+#add_custom_command(
+#	TARGET ${G_PROJECT_NAME} POST_BUILD
+#	COMMAND ${CMAKE_COMMAND} --install ${CMAKE_BINARY_DIR} --prefix ${CMAKE_BINARY_DIR}
+#	COMMENT "[${G_PROJECT_NAME}::POST BUILD] Installing."
+#)

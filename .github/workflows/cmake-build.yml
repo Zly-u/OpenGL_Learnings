@@ -1,0 +1,109 @@
+name: Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  PROJECT_NAME: "KuroEngine"
+
+jobs:
+  build-gcc:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [
+          Debug
+#          Release
+        ]
+        include:
+          - os: ubuntu-latest
+            build_type: Debug
+            config_preset: Action-Debug-gcc
+            build_preset: Build-Action-Debug-gcc
+#          - os: ubuntu-latest
+#            build_type: Release
+#            config_preset: Action-Release-gcc
+#            build_preset: Build-Action-Release-gcc
+
+    
+    runs-on: ${{matrix.os}}
+
+    env:
+      BUILD_TYPE: ${{matrix.build_type}}
+      CBUILD_DIR: ${{github.workspace}}/__CMAKE_BUILD__/${{matrix.build_type}}-gcc/Build
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: '${{github.workspace}}/vcpkg'
+          vcpkgJsonGlob: '**/vcpkg.json'
+
+
+      - name: Install build dependencies and MinGW-w64
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build
+          sudo apt-get install -y mingw-w64 gcc-mingw-w64 g++-mingw-w64
+
+
+      - name: Configure CMake
+        timeout-minutes: 15
+        run: cmake --preset ${{matrix.config_preset}}
+
+
+      - name: Build
+        timeout-minutes: 15
+        run: cmake --build --preset ${{matrix.build_preset}}
+
+
+      - name: Verify build output
+        run: file ${{env.CBUILD_DIR}}/OpenGL_Stuff.exe || echo "Executable not found"
+
+
+#      - name: Bundle MinGW runtime DLLs
+#        run: |
+#          echo "=== Bundling MinGW runtime DLLs ==="
+#
+#          echo "Finding dependencies with ldd..."
+#          ldd "${{env.CBUILD_DIR}}/Launcher.exe" | grep -i mingw64 | awk '{print $3}' | while read -r dll_path; do
+#            if [ -n "$dll_path" ] && [ -f "$dll_path" ]; then
+#              dll_name=$(basename "$dll_path")
+#              echo "Copying dependency: $dll_name"
+#              cp "$dll_path" "${{env.CBUILD_DIR}}/" || echo "Failed to copy $dll_name"
+#            fi
+#          done
+#
+#          echo "Copy essential runtime DLLs, in case ldd misses some."
+#          ESSENTIAL_DLLS=(
+#            "libgcc_s_seh-1.dll"
+#            "libstdc++-6.dll"
+#            "libwinpthread-1.dll"
+#          )
+#
+#          for dll in "${ESSENTIAL_DLLS[@]}"; do
+#            if [ -f "/usr/x86_64-w64-mingw32/bin/$dll" ] && [ ! -f "${{env.CBUILD_DIR}}/$dll" ]; then
+#              echo "Copying essential DLL: $dll"
+#              cp "/usr/x86_64-w64-mingw32/bin/$dll" "${{env.CBUILD_DIR}}/" || echo "Failed to copy $dll"
+#            fi
+#          done
+#
+#          echo "=== Final DLL list ==="
+#          ls -la "${{env.CBUILD_DIR}}"/*.dll 2>/dev/null || echo "No DLLs copied"
+
+
+#      - name: Upload build Artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{env.PROJECT_NAME}}-gcc-${{matrix.build_type}}-${{matrix.os}}
+#          path: |
+#            ${{env.CBUILD_DIR}}/
+#            ${{env.CBUILD_DIR}}/Launcher*
