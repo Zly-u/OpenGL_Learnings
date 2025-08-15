@@ -3,8 +3,32 @@ name: Build
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - 'CMakeLists.txt'
+      - '**/CMakeLists.txt'
+      - 'vcpkg.json'
+      - '**.cmake'
+      - '**.sh'
+      - '**.bat'
+      - '**.yml'
+      - '**.yaml'
   pull_request:
     branches: [ "master" ]
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - 'CMakeLists.txt'
+      - '**/CMakeLists.txt'
+      - 'vcpkg.json'
+      - '**.cmake'
+      - '**.sh'
+      - '**.bat'
+      - '**.yml'
+      - '**.yaml'
 
 env:
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
