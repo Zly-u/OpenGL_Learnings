@@ -110,7 +110,7 @@ void App::PostInit()
 	Sprite_1->Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
 
 	Sprite* Sprite_w = CreateRenderable<Sprite>("Assets/WarningText.png");
-	Sprite_w->Location = glm::vec2(WindowSize.x / 2.f, WindowSize.y / 1.3f);
+	Sprite_w->Location = glm::vec2(WindowSize.x / 5.f, WindowSize.y / 1.3f);
 	Sprite_w->ZDepth = 20.f;
 	Sprite_w->Scale *= 3.f;
 

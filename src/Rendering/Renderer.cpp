@@ -142,7 +142,7 @@ void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 		glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
 		// glEnable(GL_DEPTH_TEST);
 
-		glClearColor(0.f, 0.f, 0.f, 0.0f);
+		glClearColor(1.f, 1.f, 1.f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glDisable(GL_DEPTH_TEST);
@@ -163,11 +163,14 @@ void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
 
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glDisable(GL_DEPTH_TEST);
+
+		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBlendEquation(GL_FUNC_ADD);
 
 		ScreenRenderer.Render(
 			[&](ShaderProgramBase* ShaderProgram)

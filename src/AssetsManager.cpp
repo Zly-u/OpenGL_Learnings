@@ -48,8 +48,6 @@ void AssetsManager::LoadImage(
 		InternalFormat = GL_RGBA8;
 	}
 
-	Log::println("[INFO]: Loaded an image: {}, with colors of firs pixel: {}, {}, {}, {}", Asset, ImageData[0], ImageData[1], ImageData[2], ImageData[3]);
-
 	int rowAlignment = 1;
 	const int BytesPerRow = ImageWidth * ColorChannels;
 	if (BytesPerRow % 4 == 0)
@@ -78,7 +76,7 @@ void AssetsManager::LoadImage(
 		InternalFormat,
 		ImageWidth,
 		ImageHeight,
-		0,    // Legacy arg.
+		0,    // Legacy arg?
 		ColorFormat,
 		GL_UNSIGNED_BYTE,
 		ImageData

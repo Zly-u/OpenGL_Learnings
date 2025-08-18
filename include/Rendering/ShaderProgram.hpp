@@ -76,7 +76,6 @@ class ShaderProgramBase
 
 // ---------------------------------------------------------------------------------------
 
-// TODO: Verify Data order in TAttributeListType and VertexDataType by using GLMVertexAttribute inside VertexDataType.
 template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
 class ShaderProgram final : public ShaderProgramBase
 {

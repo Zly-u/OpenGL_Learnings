@@ -54,6 +54,28 @@ struct GLMVertexAttribute
 	static constexpr GLint SizeInBytes = Size * sizeof(Type);
 	static constexpr GLenum EnumType = TypeTrait::EnumType;
 	static constexpr GLboolean Normalized = TypeNormalized;
+
+	GLMVertexAttribute() = delete; // We don't want an accidental possibility of the attribute creation on its own.
+	GLMVertexAttribute(const GlmType& NewData) : Data(NewData) {}
+	GLMVertexAttribute(std::initializer_list<Type> NewList)
+	{
+		assert(NewList.size() == Size && "Wrong number of elements for GLM Type.");
+
+		std::array<Type, Size> ArgsArray{};
+		std::copy(NewList.begin(), NewList.end(), ArgsArray.begin());
+
+		Data = [&]<std::size_t... Indexes>(std::index_sequence<Indexes...>)
+		{
+			return GlmType{ArgsArray[Indexes]...};
+		}(std::make_index_sequence<Size>{});
+	}
+
+	void operator=(const GlmType& NewValue)
+	{
+		Data = NewValue;
+	}
+
+	GlmType Data;
 };
 
 
@@ -67,9 +89,7 @@ struct TVertexAttributesHandler
 	using AttributesTupleType = typename TAttributeListType::TupleType;
 	using VertexDataStructType = VertexDataStruct;
 
-	AttributesTupleType Attributes;
-
-		// -------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------
 
 	public:
 		explicit TVertexAttributesHandler()
@@ -78,11 +98,11 @@ struct TVertexAttributesHandler
 				sizeof(VertexDataStructType) == CalculateAttributesSize<AttributesTupleType>(),
 				"VertexDataStruct size must match sum of attribute sizes"
 			);
+
+			CheckOrder();
+
 			glGenVertexArrays(1, &VAO_ID);
 		}
-
-
-		explicit TVertexAttributesHandler(const GLuint NewVAO) : VAO_ID(NewVAO) {}
 
 
 		~TVertexAttributesHandler()
@@ -130,8 +150,8 @@ struct TVertexAttributesHandler
 			constexpr size_t AttributeSize = sizeof(typename TVertexAttribute::GlmType);
 
 			for (int i = 0; i < 4; i++) {
-				size_t vertex_offset = i * sizeof(VertexDataStructType) + AttributeOffset;
-				glBufferSubData(GL_ARRAY_BUFFER, vertex_offset, AttributeSize, &VertexData[i]);
+				size_t VertexOffset = i * sizeof(VertexDataStructType) + AttributeOffset;
+				glBufferSubData(GL_ARRAY_BUFFER, VertexOffset, AttributeSize, &VertexData[i]);
 			}
 		}
 
@@ -139,26 +159,31 @@ struct TVertexAttributesHandler
 
 
 	private:
+		template<size_t Index = 0>
+		static constexpr void CheckOrder()
+		{
+			if constexpr (Index < std::tuple_size_v<AttributesTupleType>)
+			{
+				using CurrentAttribute = std::tuple_element_t<Index, AttributesTupleType>;
+				static_assert(CurrentAttribute::Location == Index, "Incorrect Attributes order");
+				CheckOrder<Index + 1>();
+			}
+		}
+
 		template<typename TargetAttribute, size_t Index = 0>
 		static constexpr size_t CalculateAttributeOffset()
 		{
-			if constexpr (Index >= std::tuple_size_v<AttributesTupleType>)
+			static_assert(Index < std::tuple_size_v<AttributesTupleType>, "Attribute not found in list.");
+
+			using CurrentAttribute = std::tuple_element_t<Index, AttributesTupleType>;
+
+			if constexpr (std::is_same_v<CurrentAttribute, TargetAttribute>)
 			{
-				static_assert(Index < std::tuple_size_v<AttributesTupleType>, "Attribute not found in list.");
 				return 0;
 			}
 			else
 			{
-				using CurrentAttribute = std::tuple_element_t<Index, AttributesTupleType>;
-
-				if constexpr (std::is_same_v<CurrentAttribute, TargetAttribute>)
-				{
-					return 0;
-				}
-				else
-				{
-					return sizeof(typename CurrentAttribute::GlmType) + CalculateAttributeOffset<TargetAttribute, Index + 1>();
-				}
+				return sizeof(typename CurrentAttribute::GlmType) + CalculateAttributeOffset<TargetAttribute, Index + 1>();
 			}
 		}
 
