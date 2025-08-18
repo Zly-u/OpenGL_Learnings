@@ -3,10 +3,10 @@
 #include "Logging.h"
 #include "Random.h"
 
-#include "TVertexArrayObjectHandler.hpp"
+#include "TVertexAttributesHandler.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
-#include "ShaderUniformsDescriptor.hpp"
+#include "TShaderUniformsDescriptor.hpp"
 
 #include <glm/gtx/string_cast.hpp>
 
@@ -76,6 +76,7 @@ class ShaderProgramBase
 
 // ---------------------------------------------------------------------------------------
 
+// TODO: Verify Data order in TAttributeListType and VertexDataType by using GLMVertexAttribute inside VertexDataType.
 template<typename VertexDataType, typename TAttributeListType, typename TUniformsListType>
 class ShaderProgram final : public ShaderProgramBase
 {
@@ -103,18 +104,19 @@ class ShaderProgram final : public ShaderProgramBase
 			const GraphicsUpdatingFuncSign& DeinitializeGraphicsFunc
 		) override
 		{
-			// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			Use();
 
-			VAO_Handler.Bind();
+			VertexAttributesHandler.Bind();
 
 			GraphicsUpdateFunc(this);
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-			// Unbind stuff
-			glBindVertexArray(0);
+			// --- Unbind stuff ------------------------------------------------------------
+
+			VertexAttributesHandler.Unbind();
 
 			DeinitializeGraphicsFunc(this);
 
@@ -170,7 +172,8 @@ class ShaderProgram final : public ShaderProgramBase
 			glGenBuffers(1, &VBO);
 			glGenBuffers(1, &EBO);
 
-			VAO_Handler.Bind();
+			VertexAttributesHandler.SetAssociatedVBO(VBO);
+			VertexAttributesHandler.Bind();
 
 			// Vertex buffer
 			glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -180,14 +183,17 @@ class ShaderProgram final : public ShaderProgramBase
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 
-			VAO_Handler.SetupVertexAttributes();
+			VertexAttributesHandler.SetupVertexAttributes();
 
-			VAO_Handler.Unbind();
+			VertexAttributesHandler.Unbind();
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
 	public:
-		VertexArrayObjectHandler<VertexDataType, TAttributeListType> VAO_Handler;
-		ShaderUniformsDescriptor<TUniformsListType> UniformsDescriptor;
+		TVertexAttributesHandler<VertexDataType, TAttributeListType> VertexAttributesHandler;
+		TShaderUniformsDescriptor<TUniformsListType> UniformsDescriptor;
 
 		uint32_t VBO = 0;
 		uint32_t EBO = 0;

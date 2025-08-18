@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 
 #include "Logging.h"
+#include "SlidingSprite.hpp"
 #include "SpritePixelization.hpp"
 
 #include <chrono>
@@ -49,6 +50,7 @@ std::expected<bool, std::string_view> App::Init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	
 	Window = glfwCreateWindow(
 		WindowSize.x,
 		WindowSize.y,
@@ -98,7 +100,7 @@ void App::PostInit()
 		NewSprite->Rotation = Random::RangeFloat(-1.f, 1.f) * 180.f;
 	}
 
-	Sprite* Sprite_0   = CreateRenderable<Sprite>("Assets/AmyAAAA.png");
+	SlidingSprite* Sprite_0   = CreateRenderable<SlidingSprite>("Assets/AmyAAAA.png");
 	Sprite_0->Name     = "Amy1";
 	Sprite_0->Location = glm::vec2(WindowSize.x / 1.5f, WindowSize.y / 2.f);
 	Sprite_0->ZDepth = 10.f;
@@ -106,6 +108,11 @@ void App::PostInit()
 	SpritePixelization* Sprite_1 = CreateRenderable<SpritePixelization>("Assets/AmyM.png");
 	Sprite_1->Name     = "Amy2";
 	Sprite_1->Location = glm::vec2(WindowSize.x / 3.f, WindowSize.y / 2.f);
+
+	Sprite* Sprite_w = CreateRenderable<Sprite>("Assets/WarningText.png");
+	Sprite_w->Location = glm::vec2(WindowSize.x / 2.f, WindowSize.y / 1.3f);
+	Sprite_w->ZDepth = 20.f;
+	Sprite_w->Scale *= 3.f;
 
 	SortObjects();
 

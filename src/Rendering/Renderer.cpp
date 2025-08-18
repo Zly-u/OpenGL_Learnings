@@ -69,10 +69,10 @@ void Renderer::InitializeBuffers()
 	glGenTextures(1, &FrameBufferTexture_Color);
 	glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
 	glTexImage2D(
-		GL_TEXTURE_2D, 0, GL_RGB,
+		GL_TEXTURE_2D, 0, GL_RGBA,
 		WindowSize.x, WindowSize.y,
 		0,
-		GL_RGB, GL_UNSIGNED_BYTE,
+		GL_RGBA, GL_UNSIGNED_BYTE,
 		nullptr
 	);
 
@@ -142,8 +142,10 @@ void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 		glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
 		// glEnable(GL_DEPTH_TEST);
 
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.f, 0.f, 0.f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glDisable(GL_DEPTH_TEST);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -165,15 +167,17 @@ void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
+		glEnable(GL_BLEND);
 
 		ScreenRenderer.Render(
 			[&](ShaderProgramBase* ShaderProgram)
 			{
-				auto* ScreenRenderer1 = dynamic_cast<ScreenSP*>(ShaderProgram);
+				auto* ScreenRenderer1 = dynamic_cast<ScreenShaderProgram*>(ShaderProgram);
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, FrameBufferTexture_Color);
+
+				ScreenRenderer1->UniformsDescriptor.SetUniform<PassedTransformUniform>(glm::scale({1.f}, glm::vec3{1.0f}));
 				ScreenRenderer1->UniformsDescriptor.SetUniform<TextureScreenUniform>(0); // 0 corresponds to GL_TEXTURE0
 			},
 			[&](ShaderProgramBase* ShaderProgram)

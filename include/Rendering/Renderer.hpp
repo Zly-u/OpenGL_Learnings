@@ -10,6 +10,7 @@ class Renderer
 	using PositionAttribute = GLMVertexAttribute<0, glm::vec2>;
 	using UVAttribute       = GLMVertexAttribute<1, glm::vec2>;
 
+	using PassedTransformUniform = GLMShaderUniform<"PassedTransform", glm::mat4>;
 	using TextureScreenUniform = GLMShaderUniform<"ScreenTexture", GLuint>;
 
 	public:
@@ -19,10 +20,10 @@ class Renderer
 			glm::vec2 UV;
 		};
 
-		using ScreenSP = ShaderProgram<
+		using ScreenShaderProgram = ShaderProgram<
 			ScreenVertexData,
 			VertexAttributesList<PositionAttribute, UVAttribute>,
-			ShaderUniformsList<TextureScreenUniform>
+			ShaderUniformsList<PassedTransformUniform, TextureScreenUniform>
 		>;
 
 
@@ -46,7 +47,7 @@ class Renderer
 
 
 	private:
-		ScreenSP ScreenRenderer;
+		ScreenShaderProgram ScreenRenderer;
 
 		uint32_t FrameBufferObject = 0;
 		uint32_t FrameBufferTexture_Color = 0;

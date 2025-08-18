@@ -19,7 +19,6 @@ struct GLMShaderUniform
 {
 	using ValueType = GLMType;
 
-	static constexpr auto Name = NameLiteral;
 	static constexpr GLenum EnumType = UniformTypeTrait<ValueType>::Type;
 
 	GLint Location = -1;
@@ -36,13 +35,13 @@ struct GLMShaderUniform
 
 	[[nodiscard]] constexpr const char* GetName() const
 	{
-		return Name.String;
+		return NameLiteral.String;
 	}
 };
 
 
 template<typename TUniformsListType>
-class ShaderUniformsDescriptor
+class TShaderUniformsDescriptor
 {
 	using UniformTupleType = typename TUniformsListType::TupleType;
 
