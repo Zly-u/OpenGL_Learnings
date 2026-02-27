@@ -17,7 +17,7 @@ CW: Trying out a bunch of meta-programming shenanigans in here.
 
 ## How to compile
 
-The project doesn't require any setups aside from [VCPKG](https://vcpkg.io/en/) being installed.
+The project doesn't require any setups aside from [VCPKG](https://vcpkg.io/en/) being installed and path to it being set in the env. variable `VCPKG_ROOT`.
 
 So... Just run the CMake build process the usual way you do, either via CLion, VS, VSC, or terminal.
 
