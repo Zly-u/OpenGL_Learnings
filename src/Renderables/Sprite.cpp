@@ -1,5 +1,4 @@
-
-#include "Sprite.hpp"
+#include "Renderables/Sprite.hpp"
 
 #include "AssetsManager.hpp"
 

@@ -1,4 +1,4 @@
-#include "SpritePixelization.hpp"
+#include "Renderables/SpritePixelization.hpp"
 
 #include "AssetsManager.hpp"
 

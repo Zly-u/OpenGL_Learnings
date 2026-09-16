@@ -1,5 +1,5 @@
 
-#include "SlidingSprite.hpp"
+#include "Renderables/SlidingSprite.hpp"
 
 #include "AssetsManager.hpp"
 

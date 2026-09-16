@@ -15,3 +15,4 @@ struct StringLiteral
 	char String[N];
 	static constexpr std::size_t Size = N - 1;
 };
+

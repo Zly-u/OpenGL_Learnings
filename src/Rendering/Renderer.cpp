@@ -123,7 +123,7 @@ void Renderer::Cleanup()
 
 void Renderer::UpdateProjection(const glm::vec2& WindowSize)
 {
-	CameraView = glm::translate(glm::mat4(1.0f), -glm::vec3(g_CameraPos, 0.f));
+	CameraView = glm::translate(glm::mat4(1.0f), -glm::vec3(CameraPos, 0.f));
 
 	Projection = glm::ortho(
 		0.0f, WindowSize.x,	// left, right
@@ -165,7 +165,7 @@ void Renderer::Render(GLFWwindow* Window, const std::vector<Object*>& Objects)
 
 		glDisable(GL_DEPTH_TEST);
 
-		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glEnable(GL_BLEND);

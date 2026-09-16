@@ -3,9 +3,11 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include "Renderables/SlidingSprite.hpp"
+#include "Renderables/SpritePixelization.hpp"
+#include "Renderables/Solid.hpp"
+
 #include "Logging.h"
-#include "SlidingSprite.hpp"
-#include "SpritePixelization.hpp"
 
 #include <chrono>
 
@@ -113,6 +115,11 @@ void App::PostInit()
 	Sprite_w->Location = glm::vec2(WindowSize.x / 5.f, WindowSize.y / 1.3f);
 	Sprite_w->ZDepth = 20.f;
 	Sprite_w->Scale *= 3.f;
+
+	Solid* Solid_0 = CreateRenderable<Solid>();
+	Solid_0->Location = WindowSize * 0.5f;
+	Solid_0->ZDepth = 10.f;
+	Solid_0->Scale = glm::vec2(200.f);
 
 	SortObjects();
 

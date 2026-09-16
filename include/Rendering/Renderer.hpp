@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sprite.hpp"
+#include "Renderables/Sprite.hpp"
 
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -42,7 +42,7 @@ class Renderer
 		glm::mat4 Projection{1.f};
 		glm::mat4 ViewProjection{0.f};
 
-		glm::vec2 g_CameraPos{0.f, 0.f};
+		glm::vec2 CameraPos{0.f, 0.f};
 		glm::mat4 CameraView{1.f};
 
 
